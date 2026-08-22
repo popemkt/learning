@@ -1,4 +1,4 @@
-import { ActionNode, SelectorNode, SequenceNode } from "./core";
+import { ActionNode, SelectorNode, SequenceNode } from "../src";
 
 /**
  * World & Guard State
@@ -109,7 +109,7 @@ tickSimulation("Tick 1: Peaceful Guard Duty", () => {
   state.ammo = 3;
 });
 
-// Tick 2: Enemy spotted at distance
+// Tick 2: Enemy appears at distance
 tickSimulation("Tick 2: Enemy Appears!", () => {
   state.enemyInSight = true;
 });

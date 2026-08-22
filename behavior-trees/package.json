@@ -2,9 +2,10 @@
   "name": "behavior-trees",
   "version": "1.0.0",
   "type": "module",
+  "main": "src/index.ts",
   "scripts": {
-    "demo": "bun run src/demo.ts",
-    "visualize": "bun run src/visualize-demo.ts",
+    "demo": "bun run examples/demo.ts",
+    "visualize": "bun run examples/visualize.ts",
     "test": "bun test"
   }
 }

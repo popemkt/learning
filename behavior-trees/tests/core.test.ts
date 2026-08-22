@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import { ActionNode, SelectorNode, SequenceNode } from "./core";
+import { ActionNode, SelectorNode, SequenceNode } from "../src";
 
 describe("Behavior Tree Primitives", () => {
   describe("ActionNode", () => {

@@ -70,22 +70,36 @@ Decide *which child node* to run next:
 
 ---
 
-## 4. Visualization & Tools
+## 4. Directory Structure
 
-The repository includes a dedicated visualizer supporting both terminal ASCII output and Mermaid diagrams with live execution tracing:
-
-### Run the Simulation:
-```bash
-bun run src/demo.ts
+```text
+behavior-trees/
+├── src/
+│   ├── index.ts          # Public library exports
+│   ├── core.ts           # BT primitives (NodeStatus, Action, Sequence, Selector)
+│   └── visualizer.ts     # Visualizers (toAscii, toMermaid, trace overlays)
+├── examples/
+│   ├── demo.ts           # Castle guard simulation
+│   └── visualize.ts      # Visualizer script (ASCII & Mermaid outputs)
+└── tests/
+    ├── core.test.ts      # Unit tests for primitives
+    └── visualizer.test.ts # Unit tests for visualizer
 ```
 
-### Run the Visualizer (ASCII & Mermaid):
+---
+
+## 5. Running with Bun
+
 ```bash
+cd behavior-trees
+
+# Run the NPC simulation
+bun run demo
+
+# Run the visualizer
 bun run visualize
-```
 
-### Run the Tests:
-```bash
+# Run the test suite
 bun test
 ```
 

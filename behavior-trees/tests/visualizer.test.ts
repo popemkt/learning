@@ -1,6 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import { ActionNode, BTNode, NodeStatus, SelectorNode, SequenceNode } from "./core";
-import { toAscii, toMermaid } from "./visualizer";
+import { ActionNode, BTNode, NodeStatus, SelectorNode, SequenceNode, toAscii, toMermaid } from "../src";
 
 describe("Visualizer", () => {
   const isHungry = new ActionNode("Is Hungry?", () => "SUCCESS");

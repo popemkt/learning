@@ -1,5 +1,4 @@
-import { ActionNode, BTNode, NodeStatus, SelectorNode, SequenceNode } from "./core";
-import { toAscii, toMermaid } from "./visualizer";
+import { ActionNode, BTNode, NodeStatus, SelectorNode, SequenceNode, toAscii, toMermaid } from "../src";
 
 // Guard world state
 const state = {

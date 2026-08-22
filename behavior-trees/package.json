@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "demo": "bun run src/demo.ts",
+    "visualize": "bun run src/visualize-demo.ts",
     "test": "bun test"
   }
 }

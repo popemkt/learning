@@ -8,7 +8,7 @@ export type NodeStatus = "SUCCESS" | "FAILURE" | "RUNNING";
  */
 export interface BTNode {
   readonly name: string;
-  tick(): NodeStatus;
+  tick(trace?: Map<BTNode, NodeStatus>): NodeStatus;
 }
 
 /**
@@ -21,8 +21,10 @@ export class ActionNode implements BTNode {
     private readonly actionFn: () => NodeStatus
   ) {}
 
-  tick(): NodeStatus {
-    return this.actionFn();
+  tick(trace?: Map<BTNode, NodeStatus>): NodeStatus {
+    const status = this.actionFn();
+    trace?.set(this, status);
+    return status;
   }
 }
 
@@ -33,8 +35,6 @@ export class ActionNode implements BTNode {
  * - If a child returns FAILURE -> Immediately stops and returns FAILURE.
  * - If a child returns RUNNING -> Stops and returns RUNNING.
  * - If all children return SUCCESS -> Returns SUCCESS.
- *
- * Use case: "Step 1 AND Step 2 AND Step 3" (e.g. Find Enemy -> Aim -> Shoot)
  */
 export class SequenceNode implements BTNode {
   constructor(
@@ -42,13 +42,15 @@ export class SequenceNode implements BTNode {
     public readonly children: BTNode[]
   ) {}
 
-  tick(): NodeStatus {
+  tick(trace?: Map<BTNode, NodeStatus>): NodeStatus {
     for (const child of this.children) {
-      const status = child.tick();
+      const status = child.tick(trace);
       if (status !== "SUCCESS") {
+        trace?.set(this, status);
         return status;
       }
     }
+    trace?.set(this, "SUCCESS");
     return "SUCCESS";
   }
 }
@@ -60,9 +62,6 @@ export class SequenceNode implements BTNode {
  * - If a child returns SUCCESS -> Immediately stops and returns SUCCESS.
  * - If a child returns RUNNING -> Stops and returns RUNNING.
  * - If all children return FAILURE -> Returns FAILURE.
- *
- * Use case: "Try Plan A OR fallback to Plan B OR fallback to Plan C"
- * (e.g. Flee if low HP -> Attack if enemy nearby -> Patrol)
  */
 export class SelectorNode implements BTNode {
   constructor(
@@ -70,13 +69,15 @@ export class SelectorNode implements BTNode {
     public readonly children: BTNode[]
   ) {}
 
-  tick(): NodeStatus {
+  tick(trace?: Map<BTNode, NodeStatus>): NodeStatus {
     for (const child of this.children) {
-      const status = child.tick();
+      const status = child.tick(trace);
       if (status !== "FAILURE") {
+        trace?.set(this, status);
         return status;
       }
     }
+    trace?.set(this, "FAILURE");
     return "FAILURE";
   }
 }

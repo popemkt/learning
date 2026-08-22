@@ -8,22 +8,27 @@ Behavior Trees (BTs) are a modular, hierarchical model for AI decision-making. W
 
 Think of a Behavior Tree as an organized checklist with priority rules that answers one question on every cycle (**Tick**):
 
-> **"What should I do right now, and did it succeed, fail, or is it still in progress?"**
+> **"Given the current state of the world, what should I do right now?"**
 
-```
-                  ┌──────────────────────┐
-                  │    Root (Selector)   │
-                  └──────────┬───────────┘
-              ┌──────────────┴──────────────┐
-              ▼                             ▼
-    ┌──────────────────┐          ┌───────────────────┐
-    │  Sequence (AND)  │          │  Action: Patrol   │
-    │  (Combat Flow)   │          └───────────────────┘
-    └─────────┬────────┘
-        ┌─────┴─────┐
-        ▼           ▼
-  [Condition]   [Action]
-  Enemy Near?    Attack!
+```mermaid
+graph TD
+  node_1["<b>? Selector</b><br/>Guard AI Root"]
+  node_1 --> node_2
+  node_2["<b>&rarr; Sequence</b><br/>Flee Branch"]
+  node_2 --> node_3(["Condition: Is Health Low?"])
+  node_2 --> node_4(["Condition: Is Enemy In Sight?"])
+  node_2 --> node_5(["Action: Flee to safety"])
+  node_1 --> node_6
+  node_6["<b>&rarr; Sequence</b><br/>Combat Branch"]
+  node_6 --> node_7(["Condition: Is Enemy In Sight?"])
+  node_6 --> node_8
+  node_8["<b>? Selector</b><br/>Attack Mode"]
+  node_8 --> node_9
+  node_9["<b>&rarr; Sequence</b><br/>Ranged Attack"]
+  node_9 --> node_10(["Condition: Has Ammo?"])
+  node_9 --> node_11(["Action: Shoot Arrow"])
+  node_8 --> node_12(["Action: Melee Strike"])
+  node_1 --> node_13(["Action: Patrol"])
 ```
 
 ---
@@ -42,14 +47,12 @@ Every node in the tree implements one method: `tick(): NodeStatus`. It must retu
 
 ## 3. The Two Basic Building Blocks
 
-At the start, you only need to know **two types of nodes**:
-
 ### A. Leaf Nodes (Actions & Conditions)
 - The "workers" at the bottom of the tree.
 - They check the world state (e.g., `isHealthLow()`) or perform an action (e.g., `shootArrow()`).
 
 ### B. Composite Nodes (Control Flow)
-Decide *which child node* to run next.
+Decide *which child node* to run next:
 
 #### 1. `Sequence` (AND-Logic `->`)
 - Runs children **left to right**.
@@ -67,11 +70,18 @@ Decide *which child node* to run next.
 
 ---
 
-## 4. Running the Demo with Bun
+## 4. Visualization & Tools
 
-### Run the NPC Simulation:
+The repository includes a dedicated visualizer supporting both terminal ASCII output and Mermaid diagrams with live execution tracing:
+
+### Run the Simulation:
 ```bash
 bun run src/demo.ts
+```
+
+### Run the Visualizer (ASCII & Mermaid):
+```bash
+bun run visualize
 ```
 
 ### Run the Tests:

@@ -40,6 +40,10 @@ ENV/
 .coverage
 htmlcov/
 .mypy_cache/
+
+# kb JsonlStore atomic-write artifacts
+.kb/nodes.jsonl.bak
+.kb/nodes.jsonl.*.tmp
 .ruff_cache/
 .ipynb_checkpoints/
 

@@ -7,6 +7,10 @@ Repo for learning and experiments.
 - Learning Repo
   - repo is for learning, we start simple, each concepts/experiments will be in a folder.
   - we will evolve stuff later to make hierarchy/groupings if necessary if more comes down the line, but all stuff starts as 1 folder first.
+  - behavior-trees: Modeling AI decision-making with modular, reusable execution trees (Actions, Sequences, Selectors).
+    - Location: behavior-trees/ (TypeScript implementation with Bun runtime and test suite).
+    - Core Primitives: NodeStatus (SUCCESS, FAILURE, RUNNING), ActionNode, SequenceNode (AND), SelectorNode (OR/Fallback).
+    - Run simulation via 'bun run src/demo.ts' or 'bun test' inside behavior-trees/.
 
 ## Structure
 - Each concept/experiment begins in its own dedicated folder.

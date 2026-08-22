@@ -1,0 +1,9 @@
+{
+  "name": "behavior-trees",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "demo": "bun run src/demo.ts",
+    "test": "bun test"
+  }
+}

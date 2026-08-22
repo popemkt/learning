@@ -1,10 +1,15 @@
 import { writeFileSync, readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 
+interface PropValue {
+  t: "str" | "num" | "bool" | "date" | "ref";
+  v: string | number | boolean;
+}
+
 interface KbNode {
   id: string;
   text: string;
-  props?: Record<string, unknown>;
+  props?: Record<string, PropValue[]>;
   children?: string[];
   createdAt?: string;
   updatedAt?: string;
@@ -30,24 +35,111 @@ const passthroughSchema: PassthroughSchema<Record<string, unknown>> = {
   }
 };
 
-function formatNodeTree(nodes: KbNode[], rootNode: KbNode, indent = ""): string {
-  const lines: string[] = [];
-  lines.push(`${indent}- ${rootNode.text}`);
+function hasTypeRef(node: KbNode, targetRef: string): boolean {
+  const typeProps = node.props?.["sys.f.type"];
+  if (!typeProps) return false;
+  return typeProps.some((p) => p.t === "ref" && p.v === targetRef);
+}
+
+function getPropScalar(node: KbNode, fieldId: string | undefined): string | undefined {
+  if (!fieldId || !node.props) return undefined;
+  const values = node.props[fieldId];
+  if (!values || values.length === 0) return undefined;
+  const first = values[0];
+  return typeof first.v === "string" ? first.v : String(first.v);
+}
+
+function formatSubtree(nodes: KbNode[], rootNode: KbNode, indent = ""): string {
+  const lines: string[] = [`${indent}- ${rootNode.text}`];
   if (rootNode.children && Array.isArray(rootNode.children)) {
     for (const childId of rootNode.children) {
       const child = nodes.find((n) => n.id === childId);
       if (child) {
-        lines.push(formatNodeTree(nodes, child, indent + "  "));
+        lines.push(formatSubtree(nodes, child, indent + "  "));
       }
     }
   }
   return lines.join("\n");
 }
 
-function generateReadme(nodes: KbNode[]): string {
-  const contentNodes = nodes.filter(
-    (n) => !n.id.startsWith("sys.") && !n.id.startsWith("lens.")
+function getToolingNodes(nodes: KbNode[]): {
+  toolNodes: KbNode[];
+  fieldMap: Record<string, string>;
+} {
+  const toolingTag = nodes.find(
+    (n) => n.text === "tooling" && hasTypeRef(n, "sys.tag")
   );
+
+  const fieldMap: Record<string, string> = {};
+  for (const n of nodes) {
+    if (hasTypeRef(n, "sys.field")) {
+      fieldMap[n.text] = n.id;
+    }
+  }
+
+  if (!toolingTag) {
+    return { toolNodes: [], fieldMap };
+  }
+
+  const toolNodes = nodes.filter((n) => hasTypeRef(n, toolingTag.id));
+  return { toolNodes, fieldMap };
+}
+
+function renderToolingSection(nodes: KbNode[]): string {
+  const { toolNodes, fieldMap } = getToolingNodes(nodes);
+  if (toolNodes.length === 0) return "";
+
+  const sections: string[] = [];
+  for (const tool of toolNodes) {
+    const desc = getPropScalar(tool, fieldMap["description"]);
+    const cmd = getPropScalar(tool, fieldMap["command"]);
+    const usage = getPropScalar(tool, fieldMap["usage"]);
+
+    const lines: string[] = [`### ${tool.text}`];
+    if (desc) lines.push(`- **Description**: ${desc}`);
+    if (cmd) lines.push(`- **Command**: \`${cmd}\``);
+    if (usage) lines.push(`- **Usage**: \`${usage}\``);
+
+    if (tool.children && tool.children.length > 0) {
+      lines.push("- **Details & Workflows**:");
+      for (const childId of tool.children) {
+        const child = nodes.find((n) => n.id === childId);
+        if (child) {
+          lines.push(formatSubtree(nodes, child, "  "));
+        }
+      }
+    }
+    sections.push(lines.join("\n"));
+  }
+
+  return sections.join("\n\n");
+}
+
+function getRootContentNodes(nodes: KbNode[]): KbNode[] {
+  const { toolNodes } = getToolingNodes(nodes);
+  const excludedIds = new Set<string>();
+
+  const collectSubtreeIds = (nodeId: string): void => {
+    excludedIds.add(nodeId);
+    const node = nodes.find((n) => n.id === nodeId);
+    if (node?.children) {
+      for (const childId of node.children) {
+        collectSubtreeIds(childId);
+      }
+    }
+  };
+
+  for (const tool of toolNodes) {
+    collectSubtreeIds(tool.id);
+  }
+
+  // Exclude system nodes, tag/field definitions, and tooling subtrees
+  const contentNodes = nodes.filter((n) => {
+    if (n.id.startsWith("sys.") || n.id.startsWith("lens.")) return false;
+    if (hasTypeRef(n, "sys.tag") || hasTypeRef(n, "sys.field")) return false;
+    if (excludedIds.has(n.id)) return false;
+    return true;
+  });
 
   const childIds = new Set<string>();
   for (const n of contentNodes) {
@@ -55,11 +147,17 @@ function generateReadme(nodes: KbNode[]): string {
       for (const c of n.children) childIds.add(c);
     }
   }
-  const rootContentNodes = contentNodes.filter((n) => !childIds.has(n.id));
 
-  const items = rootContentNodes
-    .map((n) => formatNodeTree(contentNodes, n))
+  return contentNodes.filter((n) => !childIds.has(n.id));
+}
+
+function generateReadme(nodes: KbNode[]): string {
+  const rootContentNodes = getRootContentNodes(nodes);
+  const principles = rootContentNodes
+    .map((n) => formatSubtree(nodes, n))
     .join("\n\n");
+
+  const tooling = renderToolingSection(nodes);
 
   return `<!-- generated by kb projection; do not edit directly -->
 # Learning Workspace
@@ -67,30 +165,24 @@ function generateReadme(nodes: KbNode[]): string {
 Repo for learning and experiments.
 
 ## Principles & Organization
-${items}
+${principles}
 
 ## Structure
 - Each concept/experiment begins in its own dedicated folder.
 - Grouping and hierarchy will evolve as patterns emerge over time.
+
+## Tooling & Knowledge Base
+${tooling}
 `;
 }
 
 function generateAgentsMd(nodes: KbNode[]): string {
-  const contentNodes = nodes.filter(
-    (n) => !n.id.startsWith("sys.") && !n.id.startsWith("lens.")
-  );
-
-  const childIds = new Set<string>();
-  for (const n of contentNodes) {
-    if (n.children) {
-      for (const c of n.children) childIds.add(c);
-    }
-  }
-  const rootContentNodes = contentNodes.filter((n) => !childIds.has(n.id));
-
+  const rootContentNodes = getRootContentNodes(nodes);
   const outline = rootContentNodes
-    .map((n) => formatNodeTree(contentNodes, n))
+    .map((n) => formatSubtree(nodes, n))
     .join("\n");
+
+  const tooling = renderToolingSection(nodes);
 
   return `<!-- generated by kb projection; do not edit directly -->
 # AGENTS.md
@@ -104,6 +196,9 @@ Context and guidelines for AI agents working in this repository.
 
 ## Knowledge Base Summary
 ${outline}
+
+## Tooling & Workflow Guidelines
+${tooling}
 `;
 }
 

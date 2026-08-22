@@ -12,3 +12,13 @@ Context and guidelines for AI agents working in this repository.
 - Learning Repo
   - repo is for learning, we start simple, each concepts/experiments will be in a folder.
   - we will evolve stuff later to make hierarchy/groupings if necessary if more comes down the line, but all stuff starts as 1 folder first.
+
+## Tooling & Workflow Guidelines
+### kb CLI
+- **Description**: Repo-native outliner datastore for tracking repository knowledge, concepts, and projecting them to markdown.
+- **Command**: `kb`
+- **Usage**: `kb add <text>, kb get <id>, kb search <query>, kb action-invoke '{"id": "project.render", "input": {}}'`
+- **Details & Workflows**:
+  - Used to store repository concepts, experiments, and guidelines as structured outliner nodes in .kb/.
+  - Custom extensions in .kb/extensions project/render knowledge base state into AGENTS.md, README.md, and other documentation.
+  - Run kb action-invoke '{"id": "project.render", "input": {}}' to update markdown files after modifying KB nodes.

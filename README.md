@@ -11,3 +11,13 @@ Repo for learning and experiments.
 ## Structure
 - Each concept/experiment begins in its own dedicated folder.
 - Grouping and hierarchy will evolve as patterns emerge over time.
+
+## Tooling & Knowledge Base
+### kb CLI
+- **Description**: Repo-native outliner datastore for tracking repository knowledge, concepts, and projecting them to markdown.
+- **Command**: `kb`
+- **Usage**: `kb add <text>, kb get <id>, kb search <query>, kb action-invoke '{"id": "project.render", "input": {}}'`
+- **Details & Workflows**:
+  - Used to store repository concepts, experiments, and guidelines as structured outliner nodes in .kb/.
+  - Custom extensions in .kb/extensions project/render knowledge base state into AGENTS.md, README.md, and other documentation.
+  - Run kb action-invoke '{"id": "project.render", "input": {}}' to update markdown files after modifying KB nodes.

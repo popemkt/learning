@@ -1,0 +1,15 @@
+# Virtual environment
+.venv/
+env/
+venv/
+
+# Python caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+
+# Generated test & demo outputs
+output/
+output_*/
+sample_test.png

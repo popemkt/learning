@@ -1,0 +1,1 @@
+"""PaddleOCR Learning & Exploration Module."""

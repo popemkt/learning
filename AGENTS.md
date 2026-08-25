@@ -16,6 +16,11 @@ Context and guidelines for AI agents working in this repository.
     - Location: behavior-trees/ (TypeScript implementation with Bun runtime and test suite).
     - Core Primitives: NodeStatus (SUCCESS, FAILURE, RUNNING), ActionNode, SequenceNode (AND), SelectorNode (OR/Fallback).
     - Run simulation via 'bun run src/demo.ts' or 'bun test' inside behavior-trees/.
+  - paddle-ocr: Production-grade OCR framework & modular model pipeline (PP-OCR Det, Orientation Cls, SVTR Rec, Layout).
+    - Location: paddle-ocr/ (Python implementation with UV, Pytest, and pipeline dissection scripts).
+    - Architecture: Multi-stage cooperating models (Preprocessing/Unwarping -> DBNet Det -> PP-LCNet Orientation -> SVTR/CRNN Rec -> Assembly).
+    - Run experiments via 'python src/demo_basic.py', 'python src/demo_stages.py', or 'pytest' inside paddle-ocr/.
+- Untitled canvas
 
 ## Tooling & Workflow Guidelines
 ### kb CLI

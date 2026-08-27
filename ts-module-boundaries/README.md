@@ -26,14 +26,13 @@ This repository demonstrates how to assemble a **5-Layer Defense-in-Depth Archit
 
 ## 🏛️ The 5-Layer Defense-in-Depth Model
 
-| Layer | Responsibility | .NET Analogue | TypeScript Solution |
+| Layer | Responsibility | .NET Analogue | Modern TypeScript Solution |
 | :--- | :--- | :--- | :--- |
-| **1. Package Exports Map** | Encapsulates package internals; defines public surface | `internal` access modifier | Node.js `package.json` `"exports"` map |
-| **2. Project Tags & Boundaries** | Enforces layer and domain swimlane dependency rules | `<ProjectReference>` + ArchUnitNET | Nx Project Tags + ESLint `depConstraints` |
-| **3. Dependency Graph & Cycles** | Prevents circular dependencies at the file & barrel level | MSBuild circular project build error | `dependency-cruiser` (`no-circular` + baseline) |
-| **4. Complexity Metrics** | Identifies logic hotspots and parameter bloat | Roslyn maintainability analyzers | Oxlint / ESLint `complexity` (**Warn-Only**) |
+| **1. Package Exports Map** | Encapsulates package internals; defines public surface | `internal` access modifier | Node.js `package.json` `"exports"` + `.harness` check |
+| **2. Project Tags & Boundaries** | Enforces layer and domain swimlane dependency rules | `<ProjectReference>` + ArchUnitNET | Nx Project Tags + ESLint `depConstraints` (Boundary-only) |
+| **3. File Cycles & Graph** | Prevents circular dependencies at file & barrel level | MSBuild circular project build error | **Oxlint** `import/no-cycle` + `dependency-cruiser` |
+| **4. Complexity Metrics** | Identifies logic hotspots and parameter bloat | Roslyn maintainability analyzers | **Oxlint** `complexity` (**Warn-Only**) |
 | **5. Semantic Cohesion Review** | Evaluates single responsibility (Keep / Split / Merge) | Senior dev / NDepend architecture review | Automated Advisory Cohesion Analysis (LLM) |
-
 ```mermaid
 graph TD
     subgraph "5-Layer Defense-in-Depth Model"

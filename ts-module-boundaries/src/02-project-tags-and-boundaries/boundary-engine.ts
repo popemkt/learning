@@ -121,10 +121,6 @@ export function validateDependencyEdge(
   for (const constraint of constraints) {
     // If the source project possesses the sourceTag
     if (source.tags.includes(constraint.sourceTag)) {
-      // Determine what dimension this tag belongs to (layer:*, scope:*, etc.)
-      const dimensionPrefix = constraint.sourceTag.includes(":")
-        ? constraint.sourceTag.split(":")[0] + ":"
-        : "";
       // Check if any target tag satisfies the allowed tags
       const hasAllowedTag = target.tags.some(tag => constraint.onlyDependOnLibsWithTags.includes(tag));
 

@@ -20,12 +20,11 @@ In JavaScript and TypeScript, circular imports (`Module A -> Module B -> Module 
 
 | .NET / C# | TypeScript / JavaScript Parity |
 | :--- | :--- |
-| MSBuild build error:<br/>`Circular dependency detected between projects X and Y` | `dependency-cruiser`<br/>rule: `no-circular` (severity: `error`) |
+| MSBuild build error:<br/>`Circular dependency detected between projects X and Y` | **Oxlint** `import/no-cycle` (Fast native Rust CI gate)<br/>+ **`dependency-cruiser`** `no-circular` (Graph visualization & baselining) |
 | NDepend Dependency Structure Matrix (DSM) | `dependency-cruiser` visual graphs & cycle reporter |
 | Assembly references enforce tree hierarchy | File-level directed graph static analysis |
 
-In .NET, MSBuild refuses circular project references outright. However, because TypeScript files within the same package can reference each other freely, we need file-level static analysis via **`dependency-cruiser`**.
-
+In .NET, MSBuild refuses circular project references outright. In TypeScript, because files within the same package can reference each other freely, we enforce file-level cycle detection through **Oxlint** (`import/no-cycle: "error"`) for ultra-fast CI execution (10ms) and **`dependency-cruiser`** for architectural graph queries and legacy tech debt baselining.
 ---
 
 ## 3. The Two Types of Circular Dependencies

@@ -1,7 +1,29 @@
 {
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["oxc", "typescript", "import"],
+  "env": {
+    "node": true,
+    "builtin": true
+  },
+  "ignorePatterns": [
+    "dist",
+    "**/dist/**",
+    "node_modules",
+    "src/03-dependency-cruiser-cycles/circular-basic/**",
+    "src/03-dependency-cruiser-cycles/circular-barrel/**",
+    "src/03-dependency-cruiser-cycles/circular-legacy/**"
+  ],
+  "categories": {
+    "correctness": "warn"
+  },
   "rules": {
-    "complexity": ["warn", { "max": 5 }],
-    "max-depth": ["warn", { "max": 3 }],
-    "max-params": ["warn", { "max": 3 }]
+    "import/no-cycle": "error",
+    "typescript/no-explicit-any": "warn",
+    "typescript/no-unused-vars": "error",
+    "no-unused-vars": "off",
+    "complexity": ["warn", 5],
+    "max-depth": ["warn", 3],
+    "max-params": ["warn", 3],
+    "max-lines-per-function": ["warn", { "max": 120 }]
   }
 }

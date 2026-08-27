@@ -19,6 +19,11 @@
     "eslint",
     "oxlint"
   ],
+  "dependencies": {
+    "example-open-lib": "file:./src/01-package-exports/lib-open",
+    "example-guarded-lib": "file:./src/01-package-exports/lib-guarded",
+    "example-dual-package": "file:./src/01-package-exports/conditional-exports/dual-package"
+  },
   "devDependencies": {
     "@types/node": "^22.13.0",
     "dependency-cruiser": "^16.9.0",

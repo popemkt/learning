@@ -4,6 +4,11 @@
   "workspaces": {
     "": {
       "name": "ts-module-boundaries",
+      "dependencies": {
+        "example-dual-package": "file:./src/01-package-exports/conditional-exports/dual-package",
+        "example-guarded-lib": "file:./src/01-package-exports/lib-guarded",
+        "example-open-lib": "file:./src/01-package-exports/lib-open",
+      },
       "devDependencies": {
         "@types/node": "^22.13.0",
         "dependency-cruiser": "^16.9.0",
@@ -58,6 +63,12 @@
     "enhanced-resolve": ["enhanced-resolve@5.24.5", "", { "dependencies": { "graceful-fs": "^4.2.4", "tapable": "^2.3.3" } }, "sha512-L1l8TNvomm6UVW5B253AGxQagSQr+vGwhMlrrfRS2qmhx46AMpMVJKQYLvWYbysTMY8VoicOvzHzoHMbyzB+4A=="],
 
     "es-errors": ["es-errors@1.3.0", "", {}, "sha512-Zf5H2Kxt2xjTvbJvP2ZWLEICxA6j+hAmMzIlypy4xcBg1vKVnx89Wy0GbS+kf5cwCVFFzdCFh2XSCFNULS6csw=="],
+
+    "example-dual-package": ["example-dual-package@file:src/01-package-exports/conditional-exports/dual-package", {}],
+
+    "example-guarded-lib": ["example-guarded-lib@file:src/01-package-exports/lib-guarded", {}],
+
+    "example-open-lib": ["example-open-lib@file:src/01-package-exports/lib-open", {}],
 
     "fast-deep-equal": ["fast-deep-equal@3.1.3", "", {}, "sha512-f3qQ9oQy9j2AhBe/H9VC91wLmKBCCU/gDOnKNAYG5hswO7BLKj09Hc5HYNz9cGI++xlpDCIgDaitVs03ATR84Q=="],
 

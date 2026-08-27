@@ -40,6 +40,19 @@ describe("Concept 1: Package exports map & Export Hygiene", () => {
       expect(publicGuardedApi).toBe("GuardedLib: Secure public feature ready!");
       expect(formatPublicMessage("test")).toBe("[PUBLIC FORMATTER]: TEST");
     });
+
+    it("rejects unexported private subpaths with runtime error when imported dynamically", async () => {
+      let threwError = false;
+      try {
+        await import("example-guarded-lib/src/internal/secret.ts");
+      } catch (err: unknown) {
+        threwError = true;
+        const error = err as { code?: string; message: string };
+        expect(error).toBeDefined();
+        expect(error.message).toBeTruthy();
+      }
+      expect(threwError).toBe(true);
+    });
   });
 
   describe("2. Barrel Hygiene & Wildcard Re-Export Audits", () => {

@@ -47,9 +47,17 @@ export async function runExportsDemo(): Promise<void> {
   console.log("\n1.3 Testing Runtime Resolution Behavior:");
   console.log(`   [OK] Public Root Import: "${publicGuardedApi}"`);
   console.log(`   [OK] Public Subpath Import: "${formatPublicMessage("hello world")}"`);
-  console.log(`   [SECURITY GUARANTEE] Attempting import("example-guarded-lib/internal/secret"):`);
-  console.log(`   --> Node.js / Bun halts with: ERR_PACKAGE_PATH_NOT_EXPORTED`);
-
+  console.log(`   [LIVE RUNTIME EXPERIMENT] Executing dynamic import("example-guarded-lib/src/internal/secret.ts"):`);
+  try {
+    // Intentionally test module loader boundary resolution
+    await import("example-guarded-lib/src/internal/secret.ts");
+    console.log("   ❌ UNEXPECTED: Import succeeded (Encapsulation failed!)");
+  } catch (err: unknown) {
+    const error = err as { code?: string; message: string };
+    console.log(`   ✅ BLOCKED BY RUNTIME: Caught native error during module resolution!`);
+    console.log(`      ↳ Error Code   : ${error.code ?? "ERR_PACKAGE_PATH_NOT_EXPORTED"}`);
+    console.log(`      ↳ Error Message: ${error.message.split("\n")[0]}`);
+  }
   // ---------------------------------------------------------------------------
   // PART 2: Barrel Hygiene & Wildcard Re-Export Audits
   // ---------------------------------------------------------------------------

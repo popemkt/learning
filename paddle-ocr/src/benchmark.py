@@ -23,7 +23,7 @@ def run_benchmark(iterations: int = 10) -> None:
 
     print("\n[1] Initializing Engine...")
     t0 = time.perf_counter()
-    ocr = PaddleOCR(use_textline_orientation=True, lang="en")
+    ocr = PaddleOCR(use_textline_orientation=True, use_doc_orientation_classify=True, use_doc_unwarping=False, lang="en")
     init_ms = (time.perf_counter() - t0) * 1000
     print(f"    ├─ Engine Initialization Time: {init_ms:.2f} ms")
 

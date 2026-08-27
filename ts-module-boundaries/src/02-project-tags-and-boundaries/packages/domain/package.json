@@ -1,0 +1,11 @@
+{
+  "name": "@monorepo/domain",
+  "version": "1.0.0",
+  "type": "module",
+  "nx": {
+    "tags": ["layer:domain", "scope:shared"]
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  }
+}

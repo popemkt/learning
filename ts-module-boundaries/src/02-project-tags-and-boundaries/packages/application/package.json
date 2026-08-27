@@ -1,0 +1,11 @@
+{
+  "name": "@monorepo/application",
+  "version": "1.0.0",
+  "type": "module",
+  "nx": {
+    "tags": ["layer:application", "scope:shared"]
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  }
+}

@@ -193,7 +193,7 @@ Context and guidelines for AI agents working in this repository.
 - **Learning & Experiments**: This repository is dedicated to learning concepts and running experiments.
 - **Starting Simple**: Every concept/experiment starts in its own single directory.
 - **Organic Evolution**: Hierarchy and groupings will be introduced only when needed down the line.
-
+- **Attention Marker Style in Examples**: Code examples and demonstrations must use explicit comment markers (\`// ✅ ATTENTION:\`, \`// ⚠️ CRITICAL:\`, \`// ❌ FORBIDDEN:\`, \`// 🔒 COMPILE-TIME:\`) to highlight points of attention, safety rules, and anti-patterns.
 ## Knowledge Base Summary
 ${outline}
 

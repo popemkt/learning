@@ -1,0 +1,11 @@
+{
+  "name": "@monorepo/infrastructure",
+  "version": "1.0.0",
+  "type": "module",
+  "nx": {
+    "tags": ["layer:infrastructure", "scope:shared"]
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  }
+}

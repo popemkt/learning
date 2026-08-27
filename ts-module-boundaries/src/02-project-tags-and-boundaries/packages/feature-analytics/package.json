@@ -1,0 +1,11 @@
+{
+  "name": "@monorepo/feature-analytics",
+  "version": "1.0.0",
+  "type": "module",
+  "nx": {
+    "tags": ["layer:feature", "scope:analytics"]
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  }
+}

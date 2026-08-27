@@ -1,0 +1,12 @@
+{
+  "name": "example-misordered-package",
+  "version": "1.0.0",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./src/index.ts",
+      "types": "./src/index.d.ts",
+      "require": "./dist/index.cjs"
+    }
+  }
+}

@@ -7,11 +7,12 @@ Context and guidelines for AI agents working in this repository.
 - **Learning & Experiments**: This repository is dedicated to learning concepts and running experiments.
 - **Starting Simple**: Every concept/experiment starts in its own single directory.
 - **Organic Evolution**: Hierarchy and groupings will be introduced only when needed down the line.
-
+- **Attention Marker Style in Examples**: Code examples and demonstrations must use explicit comment markers (`// ✅ ATTENTION:`, `// ⚠️ CRITICAL:`, `// ❌ FORBIDDEN:`, `// 🔒 COMPILE-TIME:`) to highlight points of attention, safety rules, and anti-patterns.
 ## Knowledge Base Summary
 - Learning Repo
   - repo is for learning, we start simple, each concepts/experiments will be in a folder.
   - we will evolve stuff later to make hierarchy/groupings if necessary if more comes down the line, but all stuff starts as 1 folder first.
+  - code example attention markers: Use explicit comment markers (// ✅ ATTENTION:, // ⚠️ CRITICAL:, // ❌ FORBIDDEN:, // 🔒 COMPILE-TIME:) in examples to highlight key design decisions, safety rules, and anti-patterns.
   - behavior-trees: Modeling AI decision-making with modular, reusable execution trees (Actions, Sequences, Selectors).
     - Location: behavior-trees/ (TypeScript implementation with Bun runtime and test suite).
     - Core Primitives: NodeStatus (SUCCESS, FAILURE, RUNNING), ActionNode, SequenceNode (AND), SelectorNode (OR/Fallback).
@@ -20,6 +21,12 @@ Context and guidelines for AI agents working in this repository.
     - Location: paddle-ocr/ (Python implementation with UV, Pytest, and pipeline dissection scripts).
     - Architecture: Multi-stage cooperating models (Preprocessing/Unwarping -> DBNet Det -> PP-LCNet Orientation -> SVTR/CRNN Rec -> Assembly).
     - Run experiments via 'python src/demo_basic.py', 'python src/demo_stages.py', or 'pytest' inside paddle-ocr/.
+  - ts-module-boundaries: 5-layer defense-in-depth architecture for TypeScript monorepo module boundaries (restoring .NET parity).
+    - Location: ts-module-boundaries/ (TypeScript implementation with Bun runtime, Oxlint, and dependency-cruiser).
+    - Core Layers: Package exports map, Nx project tags & ESLint depConstraints, dependency-cruiser cycle prevention, warn-only complexity metrics, and advisory semantic cohesion review.
+    - Run interactive tour via 'bun run demo' or 'bun test' inside ts-module-boundaries/.
+    - Key Guardrails: Curated '.' barrels with no 'export *' wildcards, no 'tsconfig paths' aliases (preserves compile-time exports gating via Node16/NodeNext), and warn-only complexity limits.
+    - Enforcement: Compile-time gating via tsc (error TS2307 on unexported subpaths) + Runtime rejection via Node/Bun (ERR_PACKAGE_PATH_NOT_EXPORTED).
 - Untitled canvas
 
 ## Tooling & Workflow Guidelines

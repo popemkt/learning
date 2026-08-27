@@ -1,0 +1,7 @@
+{
+  "rules": {
+    "complexity": ["warn", { "max": 5 }],
+    "max-depth": ["warn", { "max": 3 }],
+    "max-params": ["warn", { "max": 3 }]
+  }
+}

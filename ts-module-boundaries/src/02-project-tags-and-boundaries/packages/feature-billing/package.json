@@ -1,0 +1,11 @@
+{
+  "name": "@monorepo/feature-billing",
+  "version": "1.0.0",
+  "type": "module",
+  "nx": {
+    "tags": ["layer:feature", "scope:billing"]
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  }
+}

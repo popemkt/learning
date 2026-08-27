@@ -9,13 +9,14 @@ import re
 from pathlib import Path
 from paddleocr import PaddleOCR
 from generate_samples import generate_all_samples
+from visualizer import draw_structured_receipt
 
 
 class ReceiptParser:
     """Parses raw PaddleOCR boxes and text into a structured receipt object."""
 
     def __init__(self, ocr_engine: PaddleOCR | None = None):
-        self.ocr = ocr_engine or PaddleOCR(use_textline_orientation=True, lang="en")
+        self.ocr = ocr_engine or PaddleOCR(use_textline_orientation=True, use_doc_orientation_classify=True, use_doc_unwarping=False, lang="en")
 
     def parse(self, image_path: str | Path) -> dict:
         results = self.ocr.predict(str(image_path))
@@ -52,8 +53,8 @@ class ReceiptParser:
             "tax": None,
             "total": None,
             "raw_text_lines": [t["text"] for t in tokens],
+            "_tokens": [{"text": t["text"], "box": t["bbox"]} for t in tokens],
         }
-
         # Spatial line grouping: group tokens that share approximately the same vertical midline
         lines = self._group_into_horizontal_lines(tokens, y_threshold=10.0)
 
@@ -150,7 +151,10 @@ def demo_receipt_extraction(image_path: str | Path) -> None:
     print(f"Tax:          ${parsed_data.get('tax')}")
     print(f"Total:        ${parsed_data.get('total')}")
 
-
+    output_dir = Path(image_path).parent.parent / "output"
+    annotated_path = output_dir / f"annotated_{Path(image_path).stem}.png"
+    draw_structured_receipt(image_path, parsed_data, output_path=annotated_path)
+    print(f"\n[Visualizer] Structured receipt visualization saved to: {annotated_path.resolve()}")
 if __name__ == "__main__":
     samples = generate_all_samples()
     demo_receipt_extraction(samples["receipt"])

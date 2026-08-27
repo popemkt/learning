@@ -41,6 +41,11 @@ ENV/
 htmlcov/
 .mypy_cache/
 
+# Experiment & OCR outputs
+output/
+results/
+**/output/
+**/results/
 # kb JsonlStore atomic-write artifacts
 .kb/nodes.jsonl.bak
 .kb/nodes.jsonl.*.tmp

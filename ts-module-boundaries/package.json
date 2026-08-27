@@ -1,0 +1,28 @@
+{
+  "name": "ts-module-boundaries",
+  "version": "1.0.0",
+  "description": "Comprehensive, digestible demonstration of TypeScript module boundaries best practices",
+  "type": "module",
+  "scripts": {
+    "demo": "bun run src/demo.ts",
+    "demo:all": "bun run src/demo.ts --all",
+    "test": "bun test",
+    "lint:depgraph": "depcruise --config .dependency-cruiser.cjs .",
+    "lint:oxlint": "oxlint -c .oxlintrc.json src/"
+  },
+  "keywords": [
+    "typescript",
+    "module-boundaries",
+    "architecture",
+    "dependency-cruiser",
+    "package-exports",
+    "eslint",
+    "oxlint"
+  ],
+  "devDependencies": {
+    "@types/node": "^22.13.0",
+    "dependency-cruiser": "^16.9.0",
+    "oxlint": "^0.15.0",
+    "typescript": "^5.7.3"
+  }
+}

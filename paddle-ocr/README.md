@@ -172,16 +172,17 @@ paddle-ocr/
 ├── pyproject.toml          # Python package configuration & dependencies
 ├── requirements.txt        # Pip requirements file
 ├── samples/                # Generated test images (cards, receipts, rotated badges)
-├── output/                 # Output visualizations and JSON predictions
+├── output/                 # (Gitignored) Output visualizations and JSON predictions
 ├── src/
 │   ├── generate_samples.py # Synthesizes test images (clean, rotated, receipts) using PIL
+│   ├── visualizer.py       # Drawing routines for bounding boxes, side-by-side comparisons & receipts
+│   ├── draw_results.py     # Standalone CLI tool to run OCR & draw annotated visuals
 │   ├── demo_basic.py       # High-level OCR prediction with bounding boxes & scores
 │   ├── demo_stages.py      # Dissects and isolates each stage (Det -> Cls -> Rec) with visual crops
 │   ├── demo_receipt.py     # Downstream parser extracting structured JSON from spatial boxes
 │   └── benchmark.py        # Latency, FPS, cold-start vs warm throughput benchmarks
 └── tests/
-    └── test_ocr.py         # Automated Pytest suite verifying accuracy & angle correction
-```
+    └── test_ocr.py         # Automated Pytest suite verifying accuracy, angle correction & visualizer
 
 ### Running the Demos
 
@@ -200,13 +201,17 @@ python src/demo_basic.py
 # 4. Dissect pipeline stages (inspects doc orientation, DBNet polygons, line crops)
 python src/demo_stages.py
 
-# 5. Run structured receipt parser (extracts merchant, line items, totals)
+# 5. Run structured receipt parser (extracts merchant, line items, totals + visual panel)
 python src/demo_receipt.py
 
-# 6. Run latency and throughput benchmarks
+# 6. Draw visual results on any custom image
+python src/draw_results.py samples/sample_card.png
+python src/draw_results.py samples/sample_receipt.png --receipt
+
+# 7. Run latency and throughput benchmarks
 python src/benchmark.py
 
-# 7. Run automated test suite
+# 8. Run automated test suite
 pytest tests/ -v
 ```
 

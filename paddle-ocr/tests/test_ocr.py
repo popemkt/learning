@@ -14,7 +14,7 @@ sys.path.insert(0, str(src_dir))
 
 from generate_samples import generate_all_samples
 from demo_receipt import ReceiptParser
-
+from visualizer import draw_ocr_annotations, draw_structured_receipt, draw_pipeline_stages
 
 @pytest.fixture(scope="session")
 def samples(tmp_path_factory):
@@ -24,7 +24,7 @@ def samples(tmp_path_factory):
 
 @pytest.fixture(scope="session")
 def ocr_engine():
-    return PaddleOCR(use_textline_orientation=True, lang="en")
+    return PaddleOCR(use_textline_orientation=True, use_doc_orientation_classify=True, use_doc_unwarping=False, lang="en")
 
 
 def test_basic_text_extraction(ocr_engine, samples):
@@ -100,3 +100,35 @@ def test_pipeline_bounding_boxes_format(ocr_engine, samples):
         x1, y1, x2, y2 = box
         assert x2 >= x1
         assert y2 >= y1
+
+
+def test_visualization_drawing_outputs(ocr_engine, samples, tmp_path):
+    """Verifies that all drawing and visualization functions generate valid output images."""
+    # 1. Test basic OCR annotations drawing
+    results = ocr_engine.predict(str(samples["card"]))
+    out_card = tmp_path / "drawn_card.png"
+    img_card = draw_ocr_annotations(samples["card"], results, output_path=out_card)
+    assert out_card.exists()
+    assert img_card.width > 0 and img_card.height > 0
+
+    # 2. Test structured receipt drawing
+    parser = ReceiptParser(ocr_engine=ocr_engine)
+    parsed = parser.parse(samples["receipt"])
+    out_receipt = tmp_path / "drawn_receipt.png"
+    img_receipt = draw_structured_receipt(samples["receipt"], parsed, output_path=out_receipt)
+    assert out_receipt.exists()
+    assert img_receipt.width > 0 and img_receipt.height > 0
+
+    # 3. Test multi-stage pipeline drawing
+    stage_data = {
+        "doc_angle": 180,
+        "unwarped": True,
+        "dt_polys": [[[10, 10], [50, 10], [50, 30], [10, 30]]],
+        "rec_texts": ["Test Text"],
+        "rec_scores": [0.99],
+        "line_angles": [0],
+    }
+    out_stages = tmp_path / "drawn_stages.png"
+    img_stages = draw_pipeline_stages(samples["rotated_180"], stage_data, output_path=out_stages)
+    assert out_stages.exists()
+    assert img_stages.width > 0 and img_stages.height > 0

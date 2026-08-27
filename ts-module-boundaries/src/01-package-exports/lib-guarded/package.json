@@ -1,0 +1,9 @@
+{
+  "name": "example-guarded-lib",
+  "version": "1.0.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./utilities": "./src/utilities.ts"
+  }
+}

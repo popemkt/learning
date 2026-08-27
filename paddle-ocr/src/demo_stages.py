@@ -26,6 +26,7 @@ from pathlib import Path
 from PIL import Image
 from paddleocr import PaddleOCR
 from generate_samples import generate_all_samples
+from visualizer import draw_pipeline_stages
 
 
 def inspect_pipeline_stages(image_path: str | Path) -> None:
@@ -42,9 +43,8 @@ def inspect_pipeline_stages(image_path: str | Path) -> None:
 
     # 1. Pipeline Instantiation
     print("[1] Initializing Pipeline Sub-Modules:")
-    ocr = PaddleOCR(use_textline_orientation=True, lang="en")
+    ocr = PaddleOCR(use_textline_orientation=True, use_doc_orientation_classify=True, use_doc_unwarping=False, lang="en")
     print("    ├─ Document Orientation: PP-LCNet_x1_0_doc_ori")
-    print("    ├─ Document Unwarper:    UVDoc")
     print("    ├─ Textline Orientation: PP-LCNet_x1_0_textline_ori")
     print("    ├─ Text Detector:        PP-OCRv6_medium_det (DBNet-based)")
     print("    └─ Text Recognizer:      PP-OCRv6_medium_rec (SVTR/CRNN-based)")
@@ -94,10 +94,21 @@ def inspect_pipeline_stages(image_path: str | Path) -> None:
         print(f"    #{i:<7} | {angle_str:<6} | {score * 100:6.2f}%    | '{text}'")
 
     print("    " + "-" * 65)
-    print(f"\n[5] Summary of Exported Artifacts:")
-    print(f"    ├─ Cropped Textlines: {crops_dir.resolve()}")
-    print(f"    └─ Full Inspection Dir: {output_dir.resolve()}")
+    stage_viz_path = output_dir / f"stages_{image_path.stem}.png"
+    stage_data = {
+        "doc_angle": doc_angle,
+        "unwarped": doc_prep.get("model_settings", {}).get("use_doc_unwarping", False),
+        "dt_polys": dt_polys,
+        "rec_texts": rec_texts,
+        "rec_scores": rec_scores,
+        "line_angles": [a if a is not None else 0 for a in angles],
+    }
+    draw_pipeline_stages(image_path, stage_data, output_path=stage_viz_path)
 
+    print(f"\n[5] Summary of Exported Artifacts:")
+    print(f"    ├─ Cropped Textlines:  {crops_dir.resolve()}")
+    print(f"    ├─ Multi-Stage Visual: {stage_viz_path.resolve()}")
+    print(f"    └─ Full Directory:     {output_dir.resolve()}")
 
 if __name__ == "__main__":
     samples = generate_all_samples()

@@ -8,6 +8,7 @@ import time
 from pathlib import Path
 from paddleocr import PaddleOCR
 from generate_samples import generate_all_samples
+from visualizer import draw_ocr_annotations
 
 
 def run_basic_ocr(image_path: str | Path) -> list[dict]:
@@ -22,7 +23,7 @@ def run_basic_ocr(image_path: str | Path) -> list[dict]:
 
     # Initialize PaddleOCR engine
     start_init = time.perf_counter()
-    ocr = PaddleOCR(use_textline_orientation=True, lang="en")
+    ocr = PaddleOCR(use_textline_orientation=True, use_doc_orientation_classify=True, use_doc_unwarping=False, lang="en")
     init_time = (time.perf_counter() - start_init) * 1000
     print(f"[Engine] Loaded in {init_time:.2f} ms")
 
@@ -41,10 +42,14 @@ def run_basic_ocr(image_path: str | Path) -> list[dict]:
     print("-" * 75)
 
     for res in results:
-        # Save visualization and JSON
+        # Save PaddleX built-in visualization and JSON
         res.save_to_img(str(output_dir))
         res.save_to_json(str(output_dir))
 
+        # Draw enhanced side-by-side high-contrast annotated image
+        annotated_path = output_dir / f"annotated_{image_path.stem}.png"
+        draw_ocr_annotations(image_path, res, output_path=annotated_path)
+        print(f"[Visualizer] Enhanced annotation saved to: {annotated_path.name}")
         rec_texts = res.get("rec_texts", [])
         rec_scores = res.get("rec_scores", [])
         rec_boxes = res.get("rec_boxes", [])

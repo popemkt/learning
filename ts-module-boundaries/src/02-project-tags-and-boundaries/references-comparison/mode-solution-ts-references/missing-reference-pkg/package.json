@@ -1,0 +1,8 @@
+{
+  "name": "@solution-mode/missing-reference-pkg",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "@solution-mode/core-pkg": "workspace:*"
+  }
+}

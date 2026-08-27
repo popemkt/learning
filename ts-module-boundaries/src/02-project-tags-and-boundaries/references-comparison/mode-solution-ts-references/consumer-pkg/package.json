@@ -1,0 +1,14 @@
+{
+  "name": "@solution-mode/consumer-pkg",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "@solution-mode/core-pkg": "workspace:*"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  }
+}

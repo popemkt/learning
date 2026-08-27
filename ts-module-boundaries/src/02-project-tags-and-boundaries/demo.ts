@@ -5,6 +5,7 @@ import {
   checkModuleBoundaries,
   loadMonorepoPackages,
 } from "./boundary-engine.js";
+import { runReferencesComparison } from "./references-comparison/comparator.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -61,11 +62,26 @@ export async function runTagsAndBoundariesDemo(): Promise<void> {
   for (const v of scopeResult.violations) {
     console.log(`   Reason: ${v.reason}`);
   }
+  console.log("\n4. Comparing Declared Reference Mechanisms:");
+  const comparisons = runReferencesComparison(__dirname);
 
-  console.log("\n   [KEY TAKEAWAY]");
-  console.log("   In .NET, <ProjectReference> and ArchUnit enforce assembly boundaries.");
-  console.log("   In TypeScript Monorepos, Nx project tags + ESLint depConstraints provide");
-  console.log("   compile/lint-time gating for both Clean Architecture layers and domain swimlanes.");
+  for (const comp of comparisons) {
+    console.log(`\n   ─── ${comp.title} ───`);
+    console.log(`   * Source of Truth : ${comp.sourceOfTruth}`);
+    console.log(`   * Dual Maintenance: ${comp.duplicateConfigRequired ? "⚠️ YES (package.json + tsconfig.json)" : "✅ NO (package.json only)"}`);
+    console.log(`   * Happy Path Output: ${comp.successResult.output}`);
+    console.log(`   * Failure Scenario : ${comp.failureDemo.scenario}`);
+    console.log(`   * Caught By        : ${comp.failureDemo.caughtBy}`);
+    const firstLineErr = comp.failureDemo.errorMessage.split("\n").find(l => l.includes("error")) || comp.failureDemo.errorMessage.split("\n")[0];
+    console.log(`   * Error Caught     : ${firstLineErr.trim()}`);
+  }
+
+  console.log("\n   [KEY TAKEAWAYS]");
+  console.log("   1. In .NET, <ProjectReference> enforces assembly boundaries.");
+  console.log("   2. In TS Monorepos, Level 1+2 (pnpm + ESLint enforceBuildableLibDependency) provides");
+  console.log("      a single source of truth in package.json without duplicating references in tsconfig.");
+  console.log("   3. Level 3 (composite: true + tsconfig references) provides native tsc -b DAG builds");
+  console.log("      but introduces dual-maintenance overhead.");
 }
 
 if (process.argv[1] === __filename) {

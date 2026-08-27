@@ -5,12 +5,12 @@ import {
   checkModuleBoundaries,
   loadMonorepoPackages,
 } from "../src/02-project-tags-and-boundaries/boundary-engine.js";
+import { runReferencesComparison } from "../src/02-project-tags-and-boundaries/references-comparison/comparator.js";
 import { InMemoryUserRepository } from "../src/02-project-tags-and-boundaries/packages/infrastructure/src/index.js";
 import { DefaultUserUseCase } from "../src/02-project-tags-and-boundaries/packages/application/src/index.js";
 import { BillingManager } from "../src/02-project-tags-and-boundaries/packages/feature-billing/src/index.js";
 import { AnalyticsTracker } from "../src/02-project-tags-and-boundaries/packages/feature-analytics/src/index.js";
 import type { User } from "../src/02-project-tags-and-boundaries/packages/domain/src/index.js";
-
 describe("Concept 2: Project Tags & Module Boundaries", () => {
   const packagesDir = join(
     import.meta.dir,
@@ -101,5 +101,29 @@ describe("Concept 2: Project Tags & Module Boundaries", () => {
     const event = analytics.trackUserAction(updatedUser, "tier_upgraded", { newTier: "enterprise" });
     expect(event.eventName).toBe("tier_upgraded");
     expect(analytics.getEventsForUser("u-101").length).toBe(1);
+  });
+
+  describe("Declared References Comparison (Workspace Single-Source vs TS Solution References)", () => {
+    const baseDir = join(import.meta.dir, "../src/02-project-tags-and-boundaries");
+    const comparisons = runReferencesComparison(baseDir);
+
+    it("evaluates both reference modes", () => {
+      expect(comparisons.length).toBe(2);
+      expect(comparisons[0].mode).toBe("workspace-single-source");
+      expect(comparisons[1].mode).toBe("solution-ts-references");
+    });
+
+    it("verifies workspace single-source requires no duplicate config", () => {
+      const ws = comparisons[0];
+      expect(ws.duplicateConfigRequired).toBe(false);
+      expect(ws.sourceOfTruth).toContain("package.json");
+    });
+
+    it("verifies TS solution mode compiles valid DAG and catches missing references in tsconfig", () => {
+      const sol = comparisons[1];
+      expect(sol.duplicateConfigRequired).toBe(true);
+      expect(sol.successResult.status).toBe("PASS");
+      expect(sol.failureDemo.errorMessage).toContain("TS6307");
+    });
   });
 });

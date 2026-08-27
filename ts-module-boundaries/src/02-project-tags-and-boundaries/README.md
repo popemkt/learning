@@ -27,15 +27,20 @@ import { trackFunnelEvent } from "@monorepo/feature-analytics";
 
 ## 2. The .NET / C# Analogue
 
-| .NET / C# | TypeScript Monorepo Parity |
-| :--- | :--- |
-| `<ProjectReference Include="..\Domain\Domain.csproj" />` | `package.json` dependencies + Project Graph |
-| ArchUnitNET / NetArchTest rule:<br/>`Types().That().ResideInNamespace("Domain").ShouldNot().HaveDependencyOn("Infrastructure")` | ESLint `@nx/enforce-module-boundaries`<br/>with `depConstraints` |
-| Assembly separation per feature / bounded context | Project Tags (`scope:billing`, `scope:analytics`) |
+| .NET / C# | TypeScript Monorepo Parity | Enforcement Mechanism |
+| :--- | :--- | :--- |
+| `<ProjectReference Include="..\Domain.csproj" />` | `package.json` `"dependencies": { "@monorepo/domain": "workspace:*" }` | pnpm workspace symlinks + `package.json` |
+| Missing reference compile error | Fails if import is not declared in `package.json` dependencies | ESLint `enforceBuildableLibDependency: true` |
+| ArchUnitNET / NetArchTest rule:<br/>`Types().That().ResideInNamespace("Domain").ShouldNot().HaveDependencyOn("Infrastructure")` | ESLint `@nx/enforce-module-boundaries`<br/>with `depConstraints` | `@nx/eslint-plugin` layer/scope validation |
+| Assembly separation per feature | Project Tags (`scope:billing`, `scope:analytics`) | Monorepo Project Graph |
 
-In .NET, if project A doesn't reference project B in its `.csproj`, compilation fails immediately. Architecture test frameworks (ArchUnitNET) add semantic assertions.  
-In TypeScript monorepos, **Nx project tags + ESLint `depConstraints`** provide compile/lint-time gating for both mechanical references and architectural layers.
+### The "Phantom Dependency" Problem & How We Enforce Declared References
+In naive TypeScript setups, a package can import another workspace package without listing it in its `package.json` dependencies (a **"Phantom Dependency"**), leading to isolated Docker build failures and broken CI caches.
 
+We enforce declared references via three complementary layers:
+1. **`enforceBuildableLibDependency: true` (ESLint `@nx`)**: Fails CI with an error if code imports a package not declared in `package.json` dependencies.
+2. **Strict pnpm Workspace Isolation**: pnpm creates isolated `node_modules` per package containing only explicitly declared dependencies.
+3. **TypeScript Project References (`composite: true` + `references`)**: `tsc -b` refuses compilation if `tsconfig.json` lacks a declared reference to the target project.
 ---
 
 ## 3. The Two-Axis Tagging Matrix

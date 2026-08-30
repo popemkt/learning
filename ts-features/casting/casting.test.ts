@@ -31,6 +31,14 @@ import {
   PaymentMethod,
 } from "./03-safe-alternatives";
 
+import {
+  demonstratePaletteSafety,
+  demonstrateTypoCatching,
+  getRoute,
+  appRoutes,
+  activeFlags,
+} from "./04-as-vs-satisfies";
+
 describe("TypeScript Type Assertion Mechanics", () => {
   it("should preserve underlying runtime properties when upcasting", () => {
     const { original, asserted } = demonstrateUpcasting();
@@ -179,5 +187,30 @@ describe("Safe Production Alternatives", () => {
     expect(res.rolesCount).toBe(4);
     expect(res.isReadonly).toBe(true);
     expect(res.endpoint).toBe("/api/v1/users");
+  });
+});
+
+describe("as vs. satisfies Operator Comparison", () => {
+  it("satisfies preserves exact member types in union dictionaries", () => {
+    const res = demonstratePaletteSafety();
+    expect(res.primaryUpper).toBe("#3B82F6");
+    expect(res.accentRedChannel).toBe(255);
+  });
+
+  it("satisfies validates contracts and catches typos", () => {
+    const res = demonstrateTypoCatching();
+    expect(res.satisfiesCatchesErrors).toBe(true);
+    expect(res.asMasksErrors).toBe(true);
+  });
+
+  it("satisfies preserves exact object keys for autocomplete and lookup", () => {
+    expect(getRoute("home")).toBe("/");
+    expect(getRoute("dashboard")).toBe("/dashboard");
+    expect(appRoutes.home.requiresAuth).toBe(false);
+  });
+
+  it("as const satisfies guarantees immutable contract adherence", () => {
+    expect(activeFlags.ENABLE_NEW_CHECKOUT).toBe(true);
+    expect(activeFlags.ALLOWED_DOMAINS[0]).toBe("example.com");
   });
 });

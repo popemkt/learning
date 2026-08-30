@@ -132,6 +132,10 @@ By defining an `"exports"` field in `package.json`, Node.js and TypeScript runti
 }
 ```
 
+> **.NET vs TypeScript Architectural Difference**:  
+> In .NET, 1 `.csproj` = 1 `.dll` = 1 public entry point. Splitting testing, contracts, or adapters requires creating separate `.csproj` projects.  
+> In TypeScript, a single package can expose multiple curated subpaths (`"."`, `"./engine"`, `"./contracts"`). However, to prevent monorepo anarchy, production repos enforce a **strict allowlist (`CURATED_SUBPATHS_ALLOWED`)** so developers cannot invent ad-hoc subpaths without architectural review.
+
 #### 🔒 Dual Compile-Time & Runtime Gating:
 ```typescript
 // ❌ FORBIDDEN: Deep internal import attempt

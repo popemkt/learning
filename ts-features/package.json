@@ -1,0 +1,16 @@
+{
+  "name": "ts-features",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "TypeScript deep-dive features, mechanics, anti-patterns, and robust design patterns",
+  "scripts": {
+    "demo:casting": "bun run casting/demo.ts",
+    "test:casting": "bun test casting/casting.test.ts",
+    "test": "bun test",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "bun-types": "latest",
+    "typescript": "^5.0.0"
+  }
+}

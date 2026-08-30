@@ -22,6 +22,12 @@ Repo for learning and experiments.
     - Run interactive tour via 'bun run demo' or 'bun test' inside ts-module-boundaries/.
     - Key Guardrails: Curated '.' barrels with no 'export *' wildcards, no 'tsconfig paths' aliases (preserves compile-time exports gating via Node16/NodeNext), and warn-only complexity limits.
     - Enforcement: Compile-time gating via tsc (error TS2307 on unexported subpaths) + Runtime rejection via Node/Bun (ERR_PACKAGE_PATH_NOT_EXPORTED).
+  - ts-features: TypeScript type system features, compiler mechanics, and production patterns.
+    - Location: ts-features/ (TypeScript implementation with Bun runtime, typecheck, and test suite).
+    - Casting & Assertions: Mechanics of 'as T' (Sufficient Overlap Rule, TS2352) vs. zero runtime type conversion (Type Erasure).
+    - Chain Casting Hazards: Why 'as unknown as T' silences compiler errors, producing runtime type illusions, missing method crashes, deserialization bugs, and refactoring drift.
+    - Safe Alternatives: User-defined type predicates ('is'), schema parsing ('Parse, don't validate'), domain mappers, discriminated unions, and 'satisfies'.
+    - Run simulation via 'bun run demo:casting' or 'bun test' inside ts-features/.
 
 - Untitled canvas
 

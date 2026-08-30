@@ -145,7 +145,63 @@ In Node.js and TypeScript, condition keys in the `"exports"` object are matched 
 
 ---
 
-## 6. Code Walkthrough in this Folder
+## 6. Subpath Exports Beyond `.` — When to Use Them vs .NET Assemblies
+
+In **.NET**, one `.csproj` project strictly compiles to one `.dll` with a single root namespace entry point. If you want to split a library into contracts, testing fixtures, or database adapters, .NET forces you to create **multiple separate `.csproj` projects** (`MyLib.csproj`, `MyLib.Contracts.csproj`, `MyLib.Testing.csproj`).
+
+In **TypeScript / Node.js**, a single package can publish multiple curated subpaths (`"."`, `"./contracts"`, `"./engine"`, `"./testing"`) without creating dozens of separate `package.json` packages.
+
+### 🎯 The 5 Legitimate Architectural Use Cases for Subpaths
+
+```mermaid
+graph TD
+    Pkg["package.json ('my-lib')"]
+    Pkg --> Dot["<b>'.' (Root Barrel)</b><br/>Primary public API for standard consumers"]
+    Pkg --> Engine["<b>'./engine'</b><br/>Heavy runtime / isolate executor (Temporal / Sandbox)"]
+    Pkg --> Contracts["<b>'./contracts'</b><br/>Lightweight Zod DTOs & types (0 heavy backend dependencies)"]
+    Pkg --> Testing["<b>'./testing'</b><br/>Mock repositories & test doubles (excluded from prod bundles)"]
+    Pkg --> Adapters["<b>'./pg-core'</b><br/>Database-specific dialect driver (Drizzle pattern)"]
+```
+
+1. **Heavy Engine / SDK Isolation (The Temporal Sandbox Pattern)**:
+   - **Problem**: Temporal workflow code runs in a deterministic V8 isolate that crashes if it imports `@nestjs/common`, `pg`, or `drizzle-orm`.
+   - **Solution**: The root barrel `.` exports standard NestJS services; `./engine` exports the isolated workflow executor.
+   - **Consumer**: Web API imports `@my-lib`; Background Worker imports `@my-lib/engine`.
+
+2. **Lightweight Contracts & Schemas vs Heavy Backend Services**:
+   - **Problem**: A React frontend or Lambda edge function needs Zod validation schemas from a backend package, but the package root barrel connects to Stripe, Postgres, and AWS SDK.
+   - **Solution**: Publish `./contracts` exposing pure Zod schemas with zero backend runtime dependencies.
+   - **Consumer**: `import { InvoiceSchema } from "@my-lib/contracts"`.
+
+3. **Database Dialect / Driver Splits (e.g. `drizzle-orm`)**:
+   - **Problem**: Supporting Postgres, MySQL, and SQLite in one package shouldn't force consumers to install all 3 native drivers (`pg`, `mysql2`, `better-sqlite3`).
+   - **Solution**: Publish `./pg-core`, `./mysql-core`, `./sqlite-core`.
+
+4. **Production Code vs Test Doubles & Mock Fixtures**:
+   - **Problem**: Downstream test suites need `MockUserRepository` and fake token generators, but mock code must never leak into production client bundles.
+   - **Solution**: Publish `./testing` (`import { MockUserRepository } from "@my-lib/testing"`).
+
+5. **Optional DevTools & UI Panels (e.g. `@tanstack/react-query`)**:
+   - **Problem**: DevTools components should only be bundled when explicitly imported in debug mode.
+   - **Solution**: Publish `./devtools` (`import { ReactQueryDevtools } from "@tanstack/react-query/devtools"`).
+
+---
+
+### ⚖️ The Architectural Tradeoff: Flexibility vs Monorepo Anarchy
+
+| Dimension | .NET / C# Approach | TypeScript / Node.js Approach |
+| :--- | :--- | :--- |
+| **Granularity Unit** | 1 Assembly (`.csproj`) = 1 Entry Point | 1 Package (`package.json`) = N Subpaths |
+| **Package Count** | High (50+ tiny `.csproj` files across a solution) | Low (Consolidated feature packages) |
+| **Risk of Inconsistency** | Low (Compiler strictly enforces 1 `.dll`) | **High (Developers invent ad-hoc subpaths everywhere)** |
+| **Production Rule** | Architecture analyzers enforce project references | **CI Harness strictly gates subpaths via allowlist** |
+
+> **The Golden Rule in Production (The Draiver Stance)**:  
+> Every library **MUST** publish a single `.` barrel by default. Additional subpaths (`./engine`, `./contracts`) are **strictly prohibited unless explicitly whitelisted in a CI harness allowlist (`CURATED_SUBPATHS_ALLOWED`)**. This gives you the dependency isolation of subpaths without allowing package organization to degrade into an unmaintainable free-for-all.
+
+---
+
+## 7. Code Walkthrough in this Folder
 
 ```text
 01-package-exports/

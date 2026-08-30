@@ -228,7 +228,102 @@ export class PluginsModule {}
 
 ---
 
-## 4. Verification & Acceptance Criteria
+## 4. Part 2: Relocate `TemporalLaneAnswerSignal` to `@draiver/lane-temporal`
+
+### The Problem:
+- `apps/draiver-api/src/plugins/temporal-lane-answer-signal.ts` currently lives directly inside the API application.
+- It contains low-level `@temporalio/client` gRPC connection management (`Connection.connect`), OpenTelemetry interceptor wiring, and signal dispatching (`client.getHandle(id).signal(...)`).
+- This is an architectural inversion: `TemporalLaneExecutor` lives inside `@draiver/lane-temporal`, while its exact twin for signal delivery (`TemporalLaneAnswerSignal`) is stranded in the API host.
+- It also takes the entire `ApiConfig` instead of a narrow `TemporalConnectionConfig`.
+
+### The Fix:
+
+#### Step 2.1: Move file to `libs/shared/lane-temporal/src/temporal-lane-answer-signal.ts`
+```typescript
+// libs/shared/lane-temporal/src/temporal-lane-answer-signal.ts
+import type { OnApplicationShutdown } from "@nestjs/common";
+import { Connection, WorkflowClient } from "@temporalio/client";
+import { OpenTelemetryWorkflowClientInterceptor } from "@temporalio/interceptors-opentelemetry";
+import {
+  ASK_USER_ANSWERED_SIGNAL,
+  laneWorkflowId,
+  type AskUserAnswerBatch,
+  type LaneRunRef,
+  type LaneAnswerSignal,
+} from "@draiver/plugin-contracts";
+
+export interface TemporalConnectionConfig {
+  address: string;
+  namespace?: string;
+}
+
+export const ANSWER_SIGNAL_DEADLINE_MS = 10_000;
+
+export class TemporalLaneAnswerSignal implements LaneAnswerSignal, OnApplicationShutdown {
+  private connection: Connection | null = null;
+  private client: WorkflowClient | null = null;
+
+  constructor(private readonly config: TemporalConnectionConfig) {}
+
+  async deliver(target: LaneRunRef, batch: AskUserAnswerBatch): Promise<void> {
+    const client = await this.getClient();
+    await client.getHandle(laneWorkflowId(target)).signal(ASK_USER_ANSWERED_SIGNAL, batch);
+  }
+
+  async onApplicationShutdown(): Promise<void> {
+    await this.connection?.close();
+    this.client = null;
+    this.connection = null;
+  }
+
+  private async getClient(): Promise<WorkflowClient> {
+    if (this.client) return this.client;
+    this.connection = await Connection.connect({ address: this.config.address });
+    this.client = new WorkflowClient({
+      connection: this.connection,
+      namespace: this.config.namespace,
+      interceptors: [new OpenTelemetryWorkflowClientInterceptor()],
+    });
+    return this.client;
+  }
+}
+```
+
+#### Step 2.2: Export from `libs/shared/lane-temporal/src/index.ts`
+```typescript
+// libs/shared/lane-temporal/src/index.ts
+export { TemporalLaneExecutor, type LaneWorkflowBinding } from "./temporal-lane-executor";
+export { TemporalLaneAnswerSignal, type TemporalConnectionConfig } from "./temporal-lane-answer-signal";
+```
+
+#### Step 2.3: Update `plugins.module.ts` in `apps/draiver-api`
+```typescript
+const LANE_ANSWER_SIGNAL_PROVIDER = {
+  provide: LANE_ANSWER_SIGNAL,
+  useFactory: async (config: ApiConfig): Promise<LaneAnswerSignal | null> => {
+    const anyPausableTemporal =
+      config.executionEngines.lens === "temporal" ||
+      config.executionEngines.spark === "temporal" ||
+      config.executionEngines.atlas === "temporal" ||
+      config.executionEngines.forge === "temporal";
+    if (!anyPausableTemporal) return null;
+
+    // 🔒 Clean lazy import from @draiver/lane-temporal
+    const { TemporalLaneAnswerSignal } = await import("@draiver/lane-temporal");
+    return new TemporalLaneAnswerSignal(config.temporal);
+  },
+  inject: [API_CONFIG],
+};
+```
+
+#### Step 2.4: Delete the old file
+```bash
+rm apps/draiver-api/src/plugins/temporal-lane-answer-signal.ts
+```
+
+---
+
+## 5. Verification & Acceptance Criteria
 
 When executing this refactoring in `draiver`, the following automated checks MUST pass:
 
@@ -246,7 +341,7 @@ When executing this refactoring in `draiver`, the following automated checks MUS
    ```bash
    pnpm run test:unit
    ```
-   *Expectation*: All unit tests pass across `apps/draiver-api` and `libs/swimlanes/*`.
+   *Expectation*: All unit tests pass across `apps/draiver-api`, `libs/swimlanes/*`, and `libs/shared/lane-temporal`.
 4. **Boundary & Quality Lints**:
    ```bash
    pnpm run lint:all
@@ -257,12 +352,13 @@ When executing this refactoring in `draiver`, the following automated checks MUS
 
 ---
 
-## 5. Summary of Architecture Benefits
+## 6. Summary of Architecture Benefits
 
 | Principle | Impact |
 | :--- | :--- |
 | **Dependency Inversion** | Libraries declare their own narrow dependencies; host apps supply them via adapters. |
 | **Encapsulated DI** | The 200-line monolithic `plugins.module.ts` reduces to clean module imports. |
 | **Zero Config Leakage** | Database strings and root app secrets are never exposed to lane libraries. |
+| **Transport Co-location** | `TemporalLaneAnswerSignal` joins `TemporalLaneExecutor` in `@draiver/lane-temporal`. |
 | **Dual-Mode Parity** | Local unit tests and CI run in 50ms in-process; production seamlessly activates Temporal over gRPC. |
 | **Pure Core** | Non-NestJS consumers (CLI, scripts, worker isolates) import `.` with zero framework baggage. |

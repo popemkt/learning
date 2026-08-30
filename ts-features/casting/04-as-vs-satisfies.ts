@@ -30,13 +30,13 @@ const annotatedPalette: PaletteConfig = {
 // ----------------------------------------------------------------------------
 // Approach B: Type Assertion (`as PaletteConfig`)
 // ----------------------------------------------------------------------------
-// ❌ FORBIDDEN: Not only widens the type, but also allows accidental bugs to pass!
+// ⚠️ Type assertion widens all properties to `string | [number, number, number]`
 const assertedPalette = {
   primary: "#3b82f6",
   accent: [255, 128, 0],
-  typoField: 12345, // Not a valid ColorValue, but 'as' might swallow or misguide
 } as PaletteConfig;
-
+// 🔒 COMPILE-TIME: Just like with type annotations, assertedPalette.primary is widened
+// to `ColorValue`, so `.toUpperCase()` is lost.
 // ----------------------------------------------------------------------------
 // Approach C: `satisfies PaletteConfig`
 // ----------------------------------------------------------------------------

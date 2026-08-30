@@ -28,6 +28,12 @@ import {
   demonstrateConstAssertion,
 } from "./03-safe-alternatives";
 
+import {
+  demonstratePaletteSafety,
+  demonstrateTypoCatching,
+  getRoute,
+  activeFlags,
+} from "./04-as-vs-satisfies";
 // ANSI Color Helpers
 const colors = {
   reset: "\x1b[0m",
@@ -187,6 +193,22 @@ export function runDemo(): void {
   // Alternative 6: as const
   const constDemo = demonstrateConstAssertion();
   success(`'as const' Assertion: Created immutable literal registry (${constDemo.rolesCount} roles)`);
+
+  // --------------------------------------------------------------------------
+  // SECTION 4: as vs. satisfies Operator Comparison
+  // --------------------------------------------------------------------------
+  section("4. 'as' vs. 'satisfies' Operator Comparison");
+  
+  const palette = demonstratePaletteSafety();
+  success(`'satisfies' vs 'as' Widening: 'palette.primary' retains string (${palette.primaryUpper}), 'accent' retains array (red=${palette.accentRedChannel})`);
+  
+  const typos = demonstrateTypoCatching();
+  success(`'satisfies' catches missing/misspelled properties at compile time; 'as' silences them`);
+  
+  const route = getRoute("home");
+  success(`'satisfies' preserves exact key autocomplete: home route -> '${route}'`);
+  
+  info(`'as const satisfies': ALLOWED_DOMAINS[0] = '${activeFlags.ALLOWED_DOMAINS[0]}' (Immutable tuple & contract safe)`);
 
   console.log(`\n${colors.bold}${colors.green}✨ All demonstrations completed successfully!${colors.reset}\n`);
 }

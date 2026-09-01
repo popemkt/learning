@@ -1,5 +1,5 @@
 // ============================================================================
-// INTERACTIVE DEMO: NEWTYPE & TYPESTATE PATTERNS IN TYPESCRIPT
+// INTERACTIVE DEMO: ADVANCED NEWTYPE & TYPESTATE PATTERNS IN TYPESCRIPT
 //
 // Run via: bun run demo (or bun run src/demo.ts)
 // ============================================================================
@@ -11,6 +11,11 @@ import {
   makeEmailAddress,
   makePositiveCents,
   makePercentageDiscount,
+  isUserId,
+  isPositiveCents,
+  assertUserId,
+  assertPositiveCents,
+  createVerifiedPrice,
   addCents,
   applyDiscount,
   processCharge,
@@ -42,63 +47,84 @@ function printSection(title: string) {
 async function runDemo() {
   console.log(`
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│  TYPESCRIPT TYPE-LEVEL ARCHITECTURE: NEWTYPE & TYPESTATE PATTERNS           │
-│  Zero-Runtime Overhead • Compile-Time Invariant & Lifecycle Enforcement     │
+│  TYPESCRIPT ADVANCED TYPE ARCHITECTURE: NEWTYPE & TYPESTATE PATTERNS        │
+│  Template Literals • Type-Level Filters • Triple Gate • State Machines      │
 └─────────────────────────────────────────────────────────────────────────────┘`);
 
   // ==========================================================================
-  // DEMO PART 1: THE NEWTYPE (BRANDED TYPES) PATTERN
+  // DEMO PART 1: THE NEWTYPE PATTERN & THE TRIPLE GATE
   // ==========================================================================
-  printHeader("PART 1: THE NEWTYPE PATTERN (Branded Nominal Types)");
-  console.log("Problem: TypeScript structural typing allows swapping 'string' IDs or numbers.");
-  console.log("Solution: Phantom unique symbols create nominal types with zero runtime cost.\n");
+  printHeader("PART 1: ADVANCED NEWTYPE & THE TRIPLE GATE ARCHITECTURE");
+  console.log("Problem: Primitive obsession & argument swapping causes silent production bugs.");
+  console.log("Solution: Phantom brand tags + Template Literals + The Triple Gate validation.\n");
 
-  printSection("1.1 Creating Valid Branded Values via Smart Constructors");
-  const user: UserId = makeUserId("usr_alexander");
+  printSection("1.1 The Triple Gate: Predicate vs Assertion vs Smart Constructor");
+  const rawApiInput: unknown = "usr_alexander";
+
+  // Gate 1: Predicate (Non-throwing guard)
+  const isValid = isUserId(rawApiInput);
+  console.log(`[Gate 1: Predicate] isUserId("${rawApiInput}") -> ${isValid}`);
+
+  // Gate 2: Assertion Function (In-place flow narrowing)
+  assertUserId(rawApiInput);
+  // 🔒 COMPILE-TIME: rawApiInput is now narrowed to UserId in place!
+  const narrowedId: UserId = rawApiInput;
+  console.log(`[Gate 2: Assertion] assertUserId() passed -> variable narrowed in-place to UserId: ${narrowedId}`);
+
+  // Gate 3: Smart Constructor (Sanitization + Validation)
+  const sanitizedUser: UserId = makeUserId("  usr_alexander  ");
+  console.log(`[Gate 3: Factory]   makeUserId("  usr_alexander  ") -> trimmed & branded: ${sanitizedUser}`);
+
+  printSection("1.2 Template Literal Pattern Matching on String Literals");
+  console.log("String literals are checked at compile time against `usr_${string}` patterns:");
   const order: OrderId = makeOrderId("ord_2026_0901");
   const keyboardSku: Sku = makeSku("HARD-KB990");
   const email = makeEmailAddress("alexander.dev@company.com");
   const itemPrice: PositiveCents = makePositiveCents(12900); // $129.00
   const discountRate = makePercentageDiscount(15); // 15% off
 
-  console.log(`[PASS] Valid UserId created:         ${user}`);
-  console.log(`[PASS] Valid OrderId created:        ${order}`);
-  console.log(`[PASS] Valid Sku created:            ${keyboardSku}`);
-  console.log(`[PASS] Valid EmailAddress created:   ${email}`);
-  console.log(`[PASS] Valid PositiveCents created:  ${itemPrice} cents ($${(itemPrice / 100).toFixed(2)})`);
-  console.log(`[PASS] Valid DiscountRate created:   ${discountRate}%`);
+  console.log(`[PASS] Valid OrderId:        ${order}`);
+  console.log(`[PASS] Valid Sku:            ${keyboardSku}`);
+  console.log(`[PASS] Valid EmailAddress:   ${email}`);
+  console.log(`[PASS] Valid PositiveCents:  ${itemPrice} cents ($${(itemPrice / 100).toFixed(2)})`);
+  console.log(`[PASS] Valid DiscountRate:   ${discountRate}%`);
 
-  printSection("1.2 Enforcing Invariants at Boundaries");
+  printSection("1.3 Type-Level Positive Number Filter: PositiveInt<T>");
+  console.log("Type-level inspects number literals to reject negative, zero, and float values:");
+  const verifiedPrice = createVerifiedPrice(2500); // Compiles!
+  console.log(`[PASS] createVerifiedPrice(2500) -> Compile-time checked: $${(verifiedPrice / 100).toFixed(2)}`);
+  console.log("🔒 COMPILE-TIME GUARANTEE: createVerifiedPrice(-50) -> TS2345: Argument 'number' is not assignable to 'never'!");
+
+  printSection("1.4 Boundary Invariant Enforcement");
   try {
-    makePositiveCents(-500);
+    assertPositiveCents(-500);
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
-    console.log(`[BLOCKED] Negative money rejected:    ${msg}`);
+    console.log(`[BLOCKED] assertPositiveCents(-500) -> ${msg}`);
   }
 
   try {
-    makeUserId("plain_string_without_prefix");
+    assertUserId("plain_string_without_prefix");
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
-    console.log(`[BLOCKED] Invalid UserId format:     ${msg}`);
+    console.log(`[BLOCKED] assertUserId("plain...")  -> ${msg}`);
   }
 
-  printSection("1.3 Compile-Time Argument Swap Prevention");
-  console.log("Executing type-safe payment processing with processCharge(userId, orderId, amount):");
-  const charge = processCharge(user, order, itemPrice);
+  printSection("1.5 Compile-Time Argument Swap Prevention");
+  const charge = processCharge(narrowedId, order, itemPrice);
   console.log(`[CHARGED] Receipt: ${charge.receiptNumber} | Amount: $${(charge.chargedAmount / 100).toFixed(2)} to ${charge.userId}`);
   console.log("\n🔒 COMPILE-TIME GUARANTEE: Calling processCharge(order, user, amount) fails with:");
   console.log("   --> TS2345: Type '\"OrderId\"' is not assignable to type '\"UserId\"'.");
 
   // ==========================================================================
-  // DEMO PART 2: THE TYPESTATE (COMPILE-TIME STATE MACHINES) PATTERN
+  // DEMO PART 2: THE TYPESTATE PATTERN
   // ==========================================================================
   printHeader("PART 2: THE TYPESTATE PATTERN (Compile-Time State Machines)");
   console.log("Problem: Out-of-order method calls (e.g. shipping unpaid orders) crash at runtime.");
   console.log("Solution: Entity state is encoded as a generic type parameter (Order<State>).\n");
 
   printSection("2.1 Lifecycle State 1: Order<DraftState>");
-  const draftOrder: Order<DraftState> = Order.create(order, user)
+  const draftOrder: Order<DraftState> = Order.create(order, narrowedId)
     .addItem(keyboardSku, itemPrice, 2)
     .applyDiscount(discountRate);
 
@@ -132,22 +158,23 @@ async function runDemo() {
   console.log(`Status:          Terminal state reached successfully!`);
 
   // ==========================================================================
-  // DEMO PART 3: THE IMPOSSIBILITY MATRIX (Compile-Time Proofs)
+  // DEMO PART 3: THE IMPOSSIBILITY MATRIX
   // ==========================================================================
   printHeader("PART 3: THE COMPILE-TIME IMPOSSIBILITY MATRIX");
   console.log(`
-| Attempted Illegal Operation                | Runtime Behavior | Compile-Time Result (Typestate)        |
-| :----------------------------------------- | :--------------- | :------------------------------------- |
-| draftOrder.ship("DHL", "123")              | Silent / Crash   | 🔒 TS2345: 'this' not Order<PaidState>  |
-| paidOrder.addItem(sku, price, 1)           | Data Corruption  | 🔒 TS2345: 'this' not Order<DraftState> |
-| shippedOrder.pay("fake_receipt")           | Double Charging  | 🔒 TS2345: 'this' not Order<Validated>  |
-| processCharge(orderId, userId, amount)     | Wrong Account    | 🔒 TS2345: 'OrderId' is not 'UserId'   |
-| makePositiveCents(-100)                    | Negative Price   | ⚠️ Invariant Exception at Boundary     |
+| Attempted Illegal Operation                | Runtime Consequence | Compile-Time Result (Typestate)        |
+| :----------------------------------------- | :------------------ | :------------------------------------- |
+| draftOrder.ship("DHL", "123")              | Silent / Crash      | 🔒 TS2345: 'this' not Order<PaidState>  |
+| paidOrder.addItem(sku, price, 1)           | Data Corruption     | 🔒 TS2345: 'this' not Order<DraftState> |
+| shippedOrder.pay("fake_receipt")           | Double Charging     | 🔒 TS2345: 'this' not Order<Validated>  |
+| processCharge(orderId, userId, amount)     | Wrong Account       | 🔒 TS2345: 'OrderId' is not 'UserId'   |
+| createVerifiedPrice(-500)                  | Negative Price      | 🔒 TS2345: Argument is 'never'         |
+| assertPositiveCents(-100)                  | Negative Price      | ⚠️ Invariant Exception at Boundary     |
 `);
 
-  console.log("=" .repeat(78));
+  console.log("=".repeat(78));
   console.log("  [SUCCESS] All Newtype and Typestate demonstrations completed flawlessly!");
-  console.log("=" .repeat(78) + "\n");
+  console.log("=".repeat(78) + "\n");
 }
 
 runDemo().catch(console.error);

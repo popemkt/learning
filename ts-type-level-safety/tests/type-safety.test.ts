@@ -6,6 +6,15 @@ import {
   makeEmailAddress,
   makePositiveCents,
   makePercentageDiscount,
+  isUserId,
+  isOrderId,
+  isPositiveCents,
+  isPercentageDiscount,
+  assertUserId,
+  assertOrderId,
+  assertPositiveCents,
+  assertPercentageDiscount,
+  createVerifiedPrice,
   addCents,
   applyDiscount,
   processCharge,
@@ -14,7 +23,9 @@ import {
   type Sku,
   type EmailAddress,
   type PositiveCents,
+  type PositiveInt,
 } from "../src/newtype.js";
+
 import {
   Order,
   type DraftState,
@@ -34,7 +45,7 @@ type Equal<X, Y> = (<T>() => T extends X ? 1 : 2) extends <T>() => T extends Y ?
   ? true
   : false;
 
-describe("Concept 1: Newtype / Branded Types Pattern", () => {
+describe("Concept 1: Advanced Newtype & Triple Gate Validation", () => {
   it("creates valid branded UserId and rejects malformed strings", () => {
     const validUser = makeUserId("usr_charlie");
     expect(validUser).toBe("usr_charlie" as UserId);
@@ -43,15 +54,16 @@ describe("Concept 1: Newtype / Branded Types Pattern", () => {
     type _TypeCheck = Expect<Equal<typeof validUser, UserId>>;
 
     // ⚠️ CRITICAL: Invariant violation checks
-    expect(() => makeUserId("invalid_prefix")).toThrow(/Invalid UserId format/);
-    expect(() => makeUserId("usr_1")).toThrow(/Invalid UserId format/);
+    expect(() => makeUserId("invalid_prefix")).toThrow(/Expected UserId/);
+    expect(() => makeUserId("usr_1")).toThrow(/Expected UserId/);
   });
 
   it("creates valid OrderId and enforces format invariants", () => {
     const validOrder = makeOrderId("ord_99001122");
     expect(validOrder).toBe("ord_99001122" as OrderId);
-    expect(() => makeOrderId("ord_1")).toThrow(/Invalid OrderId format/);
-    expect(() => makeOrderId("wrong_prefix_1234")).toThrow(/Invalid OrderId format/);
+
+    expect(() => makeOrderId("ord_1")).toThrow(/Expected OrderId/);
+    expect(() => makeOrderId("wrong_prefix_1234")).toThrow(/Expected OrderId/);
   });
 
   it("creates valid Sku and enforces uppercase alphanumeric pattern", () => {
@@ -74,9 +86,60 @@ describe("Concept 1: Newtype / Branded Types Pattern", () => {
     const cents = makePositiveCents(1599); // $15.99
     expect(cents).toBe(1599 as PositiveCents);
 
-    expect(() => makePositiveCents(0)).toThrow(/PositiveCents must be a positive integer/);
-    expect(() => makePositiveCents(-500)).toThrow(/PositiveCents must be a positive integer/);
-    expect(() => makePositiveCents(12.5)).toThrow(/PositiveCents must be a positive integer/);
+    expect(() => makePositiveCents(0)).toThrow(/Expected positive integer in cents/);
+    expect(() => makePositiveCents(-500)).toThrow(/Expected positive integer in cents/);
+    expect(() => makePositiveCents(12.5)).toThrow(/Expected positive integer in cents/);
+  });
+
+  it("validates data non-throwingly with Predicates (Gate 1)", () => {
+    expect(isUserId("usr_valid123")).toBe(true);
+    expect(isUserId("bad_prefix")).toBe(false);
+    expect(isUserId(12345)).toBe(false);
+
+    expect(isOrderId("ord_valid123")).toBe(true);
+    expect(isOrderId("ord_short")).toBe(true); // 9 chars >= 8
+
+    expect(isPositiveCents(100)).toBe(true);
+    expect(isPositiveCents(0)).toBe(false);
+    expect(isPositiveCents(-50)).toBe(false);
+    expect(isPositiveCents(12.34)).toBe(false);
+
+    expect(isPercentageDiscount(50)).toBe(true);
+    expect(isPercentageDiscount(105)).toBe(false);
+    expect(isPercentageDiscount(-1)).toBe(false);
+  });
+
+  it("narrows types in-place with Assertion Functions (Gate 2)", () => {
+    const rawUserId: unknown = "usr_narrowed99";
+
+    // Before assertion: type is unknown
+    expect(() => {
+      // @ts-expect-error - rawUserId is unknown before assertion
+      const _len = rawUserId.length;
+    }).not.toThrow();
+
+    // In-place narrowing gate
+    assertUserId(rawUserId);
+
+    // 🔒 COMPILE-TIME: TypeScript automatically narrows rawUserId to UserId in place!
+    const _narrowedCheck: UserId = rawUserId;
+    expect(_narrowedCheck).toBe("usr_narrowed99" as UserId);
+
+    expect(() => assertUserId("bad_user")).toThrow(/Expected UserId/);
+    expect(() => assertPositiveCents(-100)).toThrow(/Expected positive integer in cents/);
+    expect(() => assertPercentageDiscount(120)).toThrow(/Expected percentage between 0 and 100/);
+  });
+
+  it("enforces type-level number constraints with PositiveInt<T>", () => {
+    // 🔒 COMPILE-TIME: Positive literal compiles
+    const price = createVerifiedPrice(4500);
+    expect(price).toBe(4500 as PositiveCents);
+
+    // 🔒 COMPILE-TIME TYPE CHECKS:
+    type _PositiveCheck = Expect<Equal<PositiveInt<50>, 50>>;
+    type _NegativeCheck = Expect<Equal<PositiveInt<-50>, never>>;
+    type _ZeroCheck = Expect<Equal<PositiveInt<0>, never>>;
+    type _FloatCheck = Expect<Equal<PositiveInt<12.5>, never>>;
   });
 
   it("performs brand-safe arithmetic with addCents and applyDiscount", () => {

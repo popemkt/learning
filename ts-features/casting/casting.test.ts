@@ -38,7 +38,19 @@ import {
   appRoutes,
   activeFlags,
 } from "./04-as-vs-satisfies";
+import {
+  validateRuntimeBoundary,
+  appTheme,
+  getTypedObjectKeys,
+  createMemoizedFn,
+  createTestMock,
+  HTTP_STATUS,
+} from "./05-when-to-use-what";
 
+import {
+  mockContract,
+  ESLINT_RULES_CONFIG,
+} from "./06-prevention-and-lint-rules";
 describe("TypeScript Type Assertion Mechanics", () => {
   it("should preserve underlying runtime properties when upcasting", () => {
     const { original, asserted } = demonstrateUpcasting();
@@ -212,5 +224,73 @@ describe("as vs. satisfies Operator Comparison", () => {
   it("as const satisfies guarantees immutable contract adherence", () => {
     expect(activeFlags.ENABLE_NEW_CHECKOUT).toBe(true);
     expect(activeFlags.ALLOWED_DOMAINS[0]).toBe("example.com");
+  });
+});
+
+describe("When to Use What (Decision Framework)", () => {
+  it("Zod / Schema Validation should parse valid data and reject invalid runtime payloads", () => {
+    const valid = validateRuntimeBoundary({ id: "u_1", email: "a@b.com", age: 30 });
+    expect(valid.id).toBe("u_1");
+    expect(valid.age).toBe(30);
+
+    expect(() => validateRuntimeBoundary({ id: "u_1" })).toThrow();
+  });
+
+  it("satisfies validates in-memory theme tokens without losing property access", () => {
+    expect(appTheme.primary.toUpperCase()).toBe("#2563EB");
+    expect(appTheme.brand.dark).toBe("#1e40af");
+  });
+
+  it("as Type safely bridges TS standard library limitations like Object.keys", () => {
+    const sample = { a: 1, b: "two" };
+    const keys = getTypedObjectKeys(sample);
+    expect(keys).toContain("a");
+    expect(keys).toContain("b");
+  });
+
+  it("as Type enables encapsulated generic utility closures", () => {
+    let calls = 0;
+    const double = createMemoizedFn((x: number) => {
+      calls++;
+      return x * 2;
+    });
+    expect(double(5)).toBe(10);
+    expect(double(5)).toBe(10);
+    expect(calls).toBe(1); // Cached
+  });
+
+  it("as Type enables isolated unit test doubles without mocking unneeded APIs", async () => {
+    const mockDb = createTestMock();
+    const results = await mockDb.query("SELECT * FROM users");
+    expect(results.length).toBe(1);
+  });
+
+  it("as const generates accurate literal union types", () => {
+    expect(HTTP_STATUS.OK).toBe(200);
+    expect(HTTP_STATUS.NOT_FOUND).toBe(404);
+  });
+});
+
+describe("Automated Prevention & Mocking Guards", () => {
+  it("mockContract provides safe partial mocking and throws on unmocked calls", () => {
+    interface Service {
+      getId(): string;
+      sendEmail(to: string): Promise<boolean>;
+    }
+
+    const mock = mockContract<Service>({
+      getId: () => "mock_123",
+    });
+
+    expect(mock.getId()).toBe("mock_123");
+    expect(() => mock.sendEmail("test@example.com")).toThrow("Unmocked property or method 'sendEmail'");
+  });
+
+  it("verifies ESLint rule configuration covers key assertion anti-patterns", () => {
+    const consistentRule = ESLINT_RULES_CONFIG["@typescript-eslint/consistent-type-assertions"];
+    expect(consistentRule[0]).toBe("error");
+    expect(consistentRule[1]?.objectLiteralTypeAssertions).toBe("never");
+    expect(ESLINT_RULES_CONFIG["@typescript-eslint/no-unnecessary-type-assertion"]).toBe("error");
+    expect(ESLINT_RULES_CONFIG["no-restricted-syntax"]?.length).toBeGreaterThan(0);
   });
 });

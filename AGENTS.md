@@ -33,6 +33,11 @@ Context and guidelines for AI agents working in this repository.
     - Chain Casting Hazards: Why 'as unknown as T' silences compiler errors, producing runtime type illusions, missing method crashes, deserialization bugs, and refactoring drift.
     - Safe Alternatives: User-defined type predicates ('is'), schema parsing ('Parse, don't validate'), domain mappers, discriminated unions, and 'satisfies'.
     - Run simulation via 'bun run demo:casting' or 'bun test' inside ts-features/.
+  - ts-type-level-safety: Zero-overhead Newtype (branded types) and Typestate (compile-time state machines) patterns.
+    - Location: ts-type-level-safety/ (TypeScript implementation with Bun runtime and type test suite).
+    - Core Primitives: Brand<T, Tag> phantom branding, smart constructors, Order<State> generic lifecycle tokens (Draft, Validated, Paid, Shipped).
+    - Run simulation via 'bun run demo' or 'bun test' inside ts-type-level-safety/.
+    - Key Guardrails: Impossible states and argument swaps caught at compile time (TS2345) with zero runtime memory allocation.
 - Untitled canvas
 
 ## Tooling & Workflow Guidelines

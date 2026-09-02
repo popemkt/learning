@@ -1,57 +1,14 @@
-# OS & editor files
+# OS junk
 .DS_Store
-Thumbs.db
-*.swp
-*.swo
-*~
-.idea/
-.vscode/
-*.sublime-workspace
-*.sublime-project
 
-# Environment & credentials
-.env
-.env.*
-!.env.example
-
-# Node / JS / TS
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-.pnpm-debug.log*
+# Build artifacts
+*.tsbuildinfo
 dist/
-build/
-.next/
-.turbo/
+node_modules/
 
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-.venv/
-env/
-venv/
-ENV/
-.pytest_cache/
-.coverage
-htmlcov/
-.mypy_cache/
+# Test / tool output
+*.out
 
-# Experiment & OCR outputs
-output/
-results/
-**/output/
-**/results/
-# kb JsonlStore atomic-write artifacts
-.kb/nodes.jsonl.bak
-.kb/nodes.jsonl.*.tmp
-.ruff_cache/
-.ipynb_checkpoints/
-
-# Serena local overrides & cache
-.serena/cache/
-.serena/project.local.yml
+# Nand2Tetris: never commit the downloaded tool suite (goes outside repo per 00-setup)
+nand2tetris/tools/
+nand2tetris-2.*/ /nand2tetris/*.zip

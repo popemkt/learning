@@ -24,6 +24,9 @@ One folder per project, in order:
 | 11 | [11-compiler-ii-code-generation](11-compiler-ii-code-generation/README.md) | Software | Jack compiler backend |
 | 12 | [12-operating-system](12-operating-system/README.md) | Software | Jack OS class library |
 
+- Chapter slide decks (free, official, ~100 pages each): linked per chapter on https://www.nand2tetris.org/course — chapters 1–3 already in `~/tools/nand2tetris/docs/`
+- Book (*The Elements of Computing Systems*, MIT Press): optional paid depth, NOT required — slides + project specs + forum are sufficient
+
 ## Live resources
 
 - Course home: https://www.nand2tetris.org

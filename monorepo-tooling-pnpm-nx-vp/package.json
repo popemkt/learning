@@ -1,0 +1,30 @@
+{
+  "name": "monorepo-tooling-pnpm-nx-vp",
+  "version": "1.0.0",
+  "description": "Deep-dive architecture, mechanics, and unification guide for pnpm, Nx, and vp (Vite-Plus)",
+  "type": "module",
+  "scripts": {
+    "demo": "bun run src/demo.ts",
+    "demo:pnpm": "bun run src/01-pnpm/demo.ts",
+    "demo:nx": "bun run src/02-nx/demo.ts",
+    "demo:vp": "bun run src/03-vp/demo.ts",
+    "demo:unified": "bun run src/04-unified/demo.ts",
+    "test": "bun test",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "monorepo",
+    "pnpm",
+    "nx",
+    "vite-plus",
+    "oxlint",
+    "oxfmt",
+    "vitest",
+    "tooling-architecture"
+  ],
+  "devDependencies": {
+    "@types/node": "^22.13.0",
+    "bun-types": "latest",
+    "typescript": "^5.7.3"
+  }
+}

@@ -2,9 +2,11 @@
 
 ## Install the official software suite
 
-1. Download from https://www.nand2tetris.org/software (requires Java).
-2. Unzip OUTSIDE this repo (e.g. `~/tools/nand2tetris/`). The suite is ~50MB of Java jars — never commit it.
-3. Sanity check: run `tools/HardwareSimulator.sh` (macOS/Linux) or `tools/HardwareSimulator.bat` (Windows) and load a chip.
+Installed and verified on this machine (2026-09-02):
+
+1. Suite **v2.7** (desktop, official) from the link on https://www.nand2tetris.org/software → `~/tools/nand2tetris/` (contains `tools/` + `projects/0–13`). Never commit it (gitignored).
+2. Zip strips exec bits — run `chmod +x ~/tools/nand2tetris/tools/*.sh` once.
+3. Verified: `TextComparer.sh` runs headless, `HardwareSimulator.sh` launches under GraalVM CE 25 (Java 25 works; no separate JRE install needed).
 
 ## Tool you use per project
 

@@ -2,11 +2,17 @@
 
 ## Install the official software suite
 
-Installed and verified on this machine (2026-09-02):
+Rerunnable script (idempotent; `FORCE=1` reinstalls):
 
-1. Suite **v2.7** (desktop, official) from the link on https://www.nand2tetris.org/software → `~/tools/nand2tetris/` (contains `tools/` + `projects/0–13`). Never commit it (gitignored).
-2. Zip strips exec bits — run `chmod +x ~/tools/nand2tetris/tools/*.sh` once.
-3. Verified: `TextComparer.sh` runs headless, `HardwareSimulator.sh` launches under GraalVM CE 25 (Java 25 works; no separate JRE install needed).
+```bash
+./setup.sh
+```
+
+What it does (verified 2026-09-02):
+
+1. Downloads the official desktop suite **v2.7** (link inside the script — the page's visible zip is a source-only distro without `projects/`) → `~/tools/nand2tetris/` (`tools/` + `projects/0–13`). Never committed (gitignored).
+2. Restores exec bits the zip strips.
+3. Health-checks headless via `TextComparer.sh` — proves the jars run under whatever `java` is on PATH (GraalVM CE 25 verified; no separate JRE needed).
 
 ## Tool you use per project
 

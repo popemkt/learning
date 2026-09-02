@@ -1,0 +1,29 @@
+{
+  "name": "llm-model-formats",
+  "version": "1.0.0",
+  "description": "Deep architectural dissection and comparison of LLM model formats: GGUF vs SafeTensors vs PyTorch Pickle vs AWQ/GPTQ/EXL2 vs ONNX/TensorRT",
+  "type": "module",
+  "scripts": {
+    "demo": "bun run src/demo.ts",
+    "test": "bun test",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "llm",
+    "gguf",
+    "safetensors",
+    "quantization",
+    "pytorch",
+    "awq",
+    "gptq",
+    "exl2",
+    "onnx",
+    "tensorrt",
+    "machine-learning"
+  ],
+  "devDependencies": {
+    "@types/bun": "^1.4.0",
+    "@types/node": "^22.13.0",
+    "typescript": "^5.7.3"
+  }
+}

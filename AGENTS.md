@@ -45,10 +45,15 @@ Context and guidelines for AI agents working in this repository.
     - Draiver Unification: Eliminates dual orchestration (replaces pnpm -r in root with Nx run-many) and removes self-building anti-patterns ('pnpm run build &&') from sub-package test scripts to preserve computation caching.
   - llm-model-formats: Architectural dissection and comparison of AI model formats (GGUF, SafeTensors, PyTorch Pickle, AWQ, GPTQ, EXL2, ONNX, TensorRT).
     - Location: llm-model-formats/ (TypeScript implementation with Bun runtime, binary parsers, and test suite).
-    - Format Taxonomy: Single-file unified GGUF (metadata + tokenizer + k-quants for llama.cpp/Ollama) vs. zero-copy SafeTensors (unquantized/AWQ/GPTQ for vLLM/Transformers) vs. dangerous PyTorch pickle (.pt/.bin RCE hazard) vs. compiled engines (ONNX/TensorRT).
+    - Format Taxonomy: Single-file unified GGUF (llama.cpp/Ollama) vs. zero-copy SafeTensors (vLLM/Transformers) vs. Apple MLX unified SafeTensors (Metal native/LoRA) vs. Native FP8 E4M3/E5M2 (DeepSeek-V3/Hopper) vs. BitNet 1.58b ternary vs. dangerous PyTorch pickle (.pt/.bin RCE hazard) vs. compiled engines (ONNX/TensorRT).
     - Quantization Schemes: Mechanics of block quantization (Q4_0, Q8_0) and mixed-precision K-quants (Q4_K_M) vs. GPU-accelerated AWQ/GPTQ/EXL2, with RMSE, SNR (dB), and perplexity error metrics.
     - Hardware Engineering: VRAM budget formulas, Grouped-Query Attention (GQA) KV cache scaling, memory bandwidth bottleneck calculations, and CPU/GPU layer offloading.
     - Run simulation via 'bun run demo' or 'bun test' inside llm-model-formats/.
+  - ts-type-level-safety: Zero-overhead Newtype (branded types) and Typestate (compile-time state machines) patterns.
+    - Location: ts-type-level-safety/ (TypeScript implementation with Bun runtime and type test suite).
+    - Core Primitives: Brand<T, Tag> phantom branding, smart constructors, Order<State> generic lifecycle tokens (Draft, Validated, Paid, Shipped).
+    - Run simulation via 'bun run demo' or 'bun test' inside ts-type-level-safety/.
+    - Key Guardrails: Impossible states and argument swaps caught at compile time (TS2345) with zero runtime memory allocation.
 - Untitled canvas
 
 ## Tooling & Workflow Guidelines

@@ -42,3 +42,12 @@ One folder per project, in order:
 - Official toolchain: write `.hdl` / `.asm` / `.jack` files exactly per spec; test with the official `.tst` scripts. Do NOT commit the downloaded tool suite (see [00-setup](00-setup/README.md)).
 - Each project folder gets a short notes section: what the official tests verified, what concept clicked, what to revisit.
 - Companion primers: [../automata-theory](../automata-theory/README.md), [../category-theory](../category-theory/README.md).
+
+## Beyond the official material
+
+- [NandGame](https://www.nandgame.com) — the hardware half as a puzzle game; zero setup, great warm-up
+- [Ben Eater's 8-bit breadboard computer](https://eater.net/8bit) — watch every concept in projects 01–05 exist physically
+- [Web IDE](https://nand2tetris.github.io/web-ide/) — browser version of all tools; the desktop suite is officially deprecated in its favor
+- [Crafting Interpreters](https://craftinginterpreters.com) — free book; the natural continuation after project 11
+- [OSTEP](https://pages.cs.wisc.edu/~remzi/OSTEP/) — free book; the natural continuation after project 12
+- [CS:APP](https://csapp.cs.cmu.edu) / Berkeley [CS61C](https://cs61c.org) — real-world computer architecture beyond the simplified Hack machine

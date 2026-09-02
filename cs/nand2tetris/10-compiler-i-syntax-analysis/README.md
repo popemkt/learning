@@ -12,6 +12,14 @@
 - **Tokenizing vs parsing**: regex-able phase (lexical) vs grammar-driven phase (syntax). Keep them cleanly separate.
 - **This is where automata theory pays off** (see [../automata-theory](../automata-theory/README.md)): CFGs, left-recursion, lookahead — the parser you write is a pushdown automaton in code form.
 
+## Materials
+
+- Slides: `~/tools/nand2tetris/docs/lecture-10-compiler-i-syntax-analysis.pdf` ([source](https://drive.google.com/open?id=1CM_w6cxQpYnYHcP-OhNkNU6oD5rMnjzv))
+- Spec: `~/tools/nand2tetris/docs/project-10-compiler-i-syntax-analysis.pdf` ([source](https://drive.google.com/open?id=1O1nTS24VM2kp_ilTZCrBZOryhTK1e0qN))
+- Book: chapter 10 in `tecs-book.epub` (same folder) — slides alone suffice
+- Video: [Coursera part 2](https://www.coursera.org/learn/nand2tetris2) — software half
+- Beyond: Play with grammars visually in [JFLAP](https://www.jflap.org); pair with [../automata-theory](../automata-theory/README.md)
+
 ## Notes
 
 - _status:_ not started

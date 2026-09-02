@@ -43,11 +43,16 @@ Source page: https://www.nand2tetris.org/course (learners resources)
 | lecture-11-compiler-ii-code-generation.pdf | https://drive.google.com/open?id=1CYOcXKxfAwRHaOERvoyuNKSwdlxMo_e3 |
 | lecture-12-operating-system.pdf | https://drive.google.com/open?id=137PiYjt4CAZ3ROWiD0DJ8XMUbMM0_VHR |
 
-## Course part overviews (linked on the source page, not pulled)
+## Part overviews and free book excerpts (also on the source page)
 
-- Part I: Hardware — https://drive.google.com/open?id=1UOh_Mbcxucob4Pb1fOKpG2qnSxndBBJV
-- Part II: Software — https://drive.google.com/open?id=1WSb9gzty3DSiKfP3H9DZ3pDu78ADaBUG
+| Local file | What | Source |
+|------------|------|--------|
+| part1-hardware-overview-slides.pdf | Part I overview deck (28 pp) | https://drive.google.com/open?id=1UOh_Mbcxucob4Pb1fOKpG2qnSxndBBJV |
+| part2-software-overview-slides.pdf | Part II overview deck (13 pp) | https://drive.google.com/open?id=1WSb9gzty3DSiKfP3H9DZ3pDu78ADaBUG |
+| book-introduction.pdf | Book *Introduction* chapter (free excerpt, 8 pp) | https://drive.google.com/open?id=1CuvVy2-58iMzs47xEwxkH8npcORnqj5Y |
+| book-part2-introduction.pdf | Book *Part II* intro (free excerpt, 8 pp) | https://drive.google.com/open?id=1iU7BfNmEBU6qOk622vvuwstqdH0IU6Od |
 
 ## Teaching resources
 
 The course page also has teaching-track materials (instructor slide notes etc.). Not pulled — self-learner path uses the learners resources above. Visit the source page if you ever teach this.
+

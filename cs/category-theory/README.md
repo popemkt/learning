@@ -26,3 +26,8 @@ Primer on category theory and type theory for programmers — vocabulary for com
 ## Notes
 
 - _status:_ not started
+
+## Hands-on
+
+- Apply the vocabulary in TypeScript: [fantasy-land](https://github.com/fantasyland/fantasy-land) (algebra laws for FP structures) and the [Mostly Adequate Guide to FP](https://github.com/MostlyAdequate/mostly-adequate-guide) (free book, JS)
+- Prove it locally: the [ts-type-level-safety](../../ts-type-level-safety/README.md) and [ts-features](../../ts-features/README.md) experiments are the executable version of these ideas — sum types, smart constructors, typestate

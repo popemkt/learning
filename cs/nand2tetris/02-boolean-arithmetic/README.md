@@ -16,6 +16,14 @@
 
 `ALU` passing the official test, built almost entirely from project 1 chips.
 
+## Materials
+
+- Slides: `~/tools/nand2tetris/docs/lecture-02-boolean-arithmetic.pdf` ([source](https://drive.google.com/open?id=1ie9s3GjM2TrvL7PrEZJ00gEwezgNLOBm))
+- Spec: `~/tools/nand2tetris/docs/project-02-boolean-arithmetic.pdf` ([source](https://drive.google.com/open?id=17SzlbKXl0kc5BHsKsKMrOlx-EEpWvq7g))
+- Book: chapter 2 in `tecs-book.epub` (same folder) — slides alone suffice
+- Video: [Coursera part 1](https://www.coursera.org/learn/build-a-computer) — module matches project number
+- Beyond: Ben Eater builds a real ALU on breadboards: https://eater.net/8bit/alu
+
 ## Notes
 
 - _status:_ not started

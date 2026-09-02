@@ -16,6 +16,14 @@
 
 `Computer.hdl` runs `Mult.hack` and `Fill.hack` to completion.
 
+## Materials
+
+- Slides: `~/tools/nand2tetris/docs/lecture-05-computer-architecture.pdf` ([source](https://drive.google.com/open?id=1Z_fxYmmRNXTkAzmZ6YMoX9NXZIRVCKiw))
+- Spec: `~/tools/nand2tetris/docs/project-05-computer-architecture.pdf` ([source](https://drive.google.com/open?id=1CJ1ymH6xdC5Z-Da8G0tqowaoOXq1cdbU))
+- Book: chapter 5 in `tecs-book.epub` (same folder) — slides alone suffice
+- Video: [Coursera part 1](https://www.coursera.org/learn/build-a-computer) — module matches project number
+- Beyond: Next level up: [CS:APP](https://csapp.cs.cmu.edu) (ch. 4) and Berkeley [CS61C](https://cs61c.org) lectures
+
 ## Notes
 
 - _status:_ not started

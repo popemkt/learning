@@ -16,6 +16,14 @@
 
 Full Hack memory hierarchy + PC, all official tests green.
 
+## Materials
+
+- Slides: `~/tools/nand2tetris/docs/lecture-03-memory.pdf` ([source](https://drive.google.com/open?id=1boFooygPrxMX-AxzogFYIZ-8QsZiDz96))
+- Spec: `~/tools/nand2tetris/docs/project-03-memory.pdf` ([source](https://drive.google.com/open?id=1ArUW8mkh4Kax-2TXGRpjPWuHf70u6_TJ))
+- Book: chapter 3 in `tecs-book.epub` (same folder) — slides alone suffice
+- Video: [Coursera part 1](https://www.coursera.org/learn/build-a-computer) — module matches project number
+- Beyond: Ben Eater on registers and RAM: https://eater.net/8bit/registers and https://eater.net/8bit/ram
+
 ## Notes
 
 - _status:_ not started

@@ -16,6 +16,14 @@
 
 15 `.hdl` chips in `01/`, all green in Hardware Simulator. Chapter 1: https://www.nand2tetris.org/book
 
+## Materials
+
+- Slides: `~/tools/nand2tetris/docs/lecture-01-boolean-logic.pdf` ([source](https://drive.google.com/open?id=1MY1buFHo_Wx5DPrKhCNSA2cm5ltwFJzM))
+- Spec: `~/tools/nand2tetris/docs/project-01-boolean-logic.pdf` ([source](https://drive.google.com/open?id=17Rt3z7_OvpoQNlM6xtmC67Rn3blgM4W5))
+- Book: chapter 1 in `tecs-book.epub` (same folder) — slides alone suffice
+- Video: [Coursera part 1](https://www.coursera.org/learn/build-a-computer) — module matches project number
+- Beyond: Play [NandGame](https://www.nandgame.com) — the same gates as puzzles; watch gates turn into a computer on breadboards: [Ben Eater's 8-bit series](https://eater.net/8bit)
+
 ## Notes
 
 - _status:_ not started

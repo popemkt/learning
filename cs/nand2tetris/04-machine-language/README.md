@@ -16,6 +16,14 @@
 
 Both `.asm` programs pass in the CPU emulator.
 
+## Materials
+
+- Slides: `~/tools/nand2tetris/docs/lecture-04-machine-language.pdf` ([source](https://drive.google.com/open?id=1HxjPmIZkFHl-BVW3qoz8eD9dqEuEyuBI))
+- Spec: `~/tools/nand2tetris/docs/project-04-machine-language.pdf` ([source](https://drive.google.com/open?id=1orGwC3o74vGv_rk-FDwoJGVvTxWGuQOC))
+- Book: chapter 4 in `tecs-book.epub` (same folder) — slides alone suffice
+- Video: [Coursera part 1](https://www.coursera.org/learn/build-a-computer) — module matches project number
+- Beyond: Hand-assemble the same programs with the [web IDE](https://nand2tetris.github.io/web-ide/) when away from the desktop tools
+
 ## Notes
 
 - _status:_ not started

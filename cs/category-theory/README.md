@@ -1,6 +1,6 @@
 # category-theory
 
-Primer on category theory and type theory for programmers — vocabulary for composing abstractions, and the math behind the type-level work in [ts-type-level-safety](../ts-type-level-safety/README.md) and [ts-features](../ts-features/README.md).
+Primer on category theory and type theory for programmers — vocabulary for composing abstractions, and the math behind the type-level work in [ts-type-level-safety](../../ts-type-level-safety/README.md) and [ts-features](../../ts-features/README.md).
 
 ## Study order
 

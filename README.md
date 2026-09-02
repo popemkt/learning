@@ -52,11 +52,10 @@ Repo for learning and experiments.
 
 - Untitled canvas
 
-- nand2tetris: Ground-up CS track — build a computer from a Nand gate, then the full software stack (assembler, VM, Jack compiler, OS) using the official Nand2Tetris toolchain. Location: nand2tetris/ (HDL, Hack assembly, Jack). One folder per project 00-setup through 12-operating-system, each README links theory + live resources. Resources: nand2tetris.org, Coursera parts 1-2, official Q&A forum.
-
-- automata-theory: Theory of computation primer (DFAs/NFAs, regex, CFGs, pumping lemma, Turing machines, decidability, P/NP). Location: automata-theory/ (notes hub). Pairs with nand2tetris: CFGs drive the Jack parser (project 10), universal-machine idea underlies the VM. Resources: MIT OCW 18.404J (Sipser lectures), Sipser 3rd ed, Neso Academy playlist.
-
-- category-theory: Category theory & type theory primer for programmers (categories, functors, natural transformations, products/coproducts, monads, Curry-Howard, parametricity). Location: category-theory/ (notes hub). Bridges to ts-type-level-safety and ts-features experiments. Resources: Milewski Category Theory for Programmers (free PDF + lectures), Awodey, Pierce TAPL.
+- cs: Ground-up CS relearning track grouping. Children: nand2tetris (official toolchain, projects 00-12), automata-theory primer, category-theory primer. Location: cs/. Folder grouping introduced early at user request; each concept remains an independent folder.
+  - nand2tetris: Ground-up CS track — build a computer from a Nand gate, then the full software stack (assembler, VM, Jack compiler, OS) using the official Nand2Tetris toolchain. Location: cs/nand2tetris/ (HDL, Hack assembly, Jack). One folder per project 00-setup through 12-operating-system, each README links theory + live resources. Resources: nand2tetris.org, Coursera parts 1-2, official Q&A forum.
+  - automata-theory: Theory of computation primer (DFAs/NFAs, regex, CFGs, pumping lemma, Turing machines, decidability, P/NP). Location: cs/automata-theory/ (notes hub). Pairs with nand2tetris: CFGs drive the Jack parser (project 10), universal-machine idea underlies the VM. Resources: MIT OCW 18.404J (Sipser lectures), Sipser 3rd ed, Neso Academy playlist.
+  - category-theory: Category theory & type theory primer for programmers (categories, functors, natural transformations, products/coproducts, monads, Curry-Howard, parametricity). Location: cs/category-theory/ (notes hub). Bridges to ts-type-level-safety and ts-features experiments. Resources: Milewski Category Theory for Programmers (free PDF + lectures), Awodey, Pierce TAPL.
 
 ## Structure
 - Each concept/experiment begins in its own dedicated folder.

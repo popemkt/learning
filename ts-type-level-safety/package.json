@@ -1,24 +1,18 @@
 {
   "name": "ts-type-level-safety",
   "version": "1.0.0",
-  "description": "Comprehensive demonstration of Newtype (Branded Types) and Typestate patterns in TypeScript",
   "type": "module",
+  "description": "Production TypeScript architectural patterns, typestates, Zod intersections, and nominal safety modeled from Draiver",
   "scripts": {
     "demo": "bun run src/demo.ts",
     "test": "bun test",
     "typecheck": "tsc --noEmit"
   },
-  "keywords": [
-    "typescript",
-    "newtype",
-    "branded-types",
-    "typestate",
-    "state-machine",
-    "compile-time-safety"
-  ],
+  "dependencies": {
+    "zod": "^4.5.4"
+  },
   "devDependencies": {
-    "@types/bun": "^1.4.0",
-    "@types/node": "^22.13.0",
-    "typescript": "^5.7.3"
+    "bun-types": "latest",
+    "typescript": "^5.0.0"
   }
 }

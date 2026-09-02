@@ -11,4 +11,7 @@ node_modules/
 
 # Nand2Tetris: never commit the downloaded tool suite (goes outside repo per 00-setup)
 nand2tetris/tools/
-nand2tetris-2.*/ /nand2tetris/*.zip
+nand2tetris-2.*/
+nand2tetris/*.zip
+*.bak
+

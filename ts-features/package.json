@@ -6,8 +6,20 @@
   "scripts": {
     "demo:casting": "bun run casting/demo.ts",
     "test:casting": "bun test casting/casting.test.ts",
+    "demo:zod": "bun run zod-type-inference/demo.ts",
+    "test:zod": "bun test zod-type-inference/zod-type-inference.test.ts",
+    "demo:index-access": "bun run index-access-types/demo.ts",
+    "test:index-access": "bun test index-access-types/index-access-types.test.ts",
+    "demo:generics": "bun run generics-and-currying/demo.ts",
+    "test:generics": "bun test generics-and-currying/generics-and-currying.test.ts",
+    "demo:decorators": "bun run decorator-reflection/demo.ts",
+    "test:decorators": "bun test decorator-reflection/decorator-reflection.test.ts",
     "test": "bun test",
     "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "reflect-metadata": "^0.2.2",
+    "zod": "^4.5.4"
   },
   "devDependencies": {
     "bun-types": "latest",

@@ -2,7 +2,7 @@
  * demo.ts
  *
  * Interactive tour & executable demonstration of TypeScript Type Assertions,
- * Chain Casting Hazards, and Safe Production Patterns.
+ * Chain Casting Hazards, and Safe Production Patterns with inline code visualization.
  */
 
 import {
@@ -34,6 +34,7 @@ import {
   getRoute,
   activeFlags,
 } from "./04-as-vs-satisfies";
+
 // ANSI Color Helpers
 const colors = {
   reset: "\x1b[0m",
@@ -46,6 +47,7 @@ const colors = {
   magenta: "\x1b[35m",
   cyan: "\x1b[36m",
   white: "\x1b[37m",
+  bgDark: "\x1b[48;5;236m",
 };
 
 function banner(title: string): void {
@@ -55,7 +57,17 @@ function banner(title: string): void {
 }
 
 function section(title: string): void {
+  console.log(`\n${colors.bold}${colors.yellow}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${colors.reset}`);
   console.log(`${colors.bold}${colors.yellow}▶ ${title}${colors.reset}`);
+  console.log(`${colors.bold}${colors.yellow}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${colors.reset}\n`);
+}
+
+function codeSnippet(title: string, code: string): void {
+  console.log(`  ${colors.dim}┌─ 💻 ${colors.cyan}${title}${colors.dim} ──────────────────────────────────────────${colors.reset}`);
+  for (const line of code.trim().split("\n")) {
+    console.log(`  ${colors.dim}│${colors.reset}  ${line}`);
+  }
+  console.log(`  ${colors.dim}└─────────────────────────────────────────────────────────────${colors.reset}`);
 }
 
 function success(msg: string): void {
@@ -82,125 +94,145 @@ export function runDemo(): void {
   // --------------------------------------------------------------------------
   section("1. Type Assertion Mechanics (as T)");
   
+  codeSnippet("Upcasting & Type Erasure", `
+const admin: AdminUser = { id: "usr_9981", role: "admin", permissions: [...] };
+const entity = admin as Entity; // Upcast: wide compile-time type, object untouched at runtime
+
+const stringVal: unknown = "12345";
+const num = stringVal as number; // ⚠️ ZERO runtime JS code generated! (typeof is still "string")
+  `);
+
   const upcast = demonstrateUpcasting();
   success(`Upcast AdminUser -> Entity: ID = ${upcast.asserted.id}`);
-  info(`At runtime, underlying object retains role='${Reflect.get(upcast.asserted, "role")}' (Structural truth)`);
+  info(`Runtime Reality: Underlying object still has role='${Reflect.get(upcast.asserted, "role")}' in memory`);
 
   const downcast = demonstrateDowncasting({ id: "usr_007" });
   success(`Downcast Entity -> User: ID = ${downcast.id}`);
-  info(`downcast.email is '${downcast.email}' at runtime (undefined because downcasting is unchecked!)`);
+  info(`Runtime Reality: downcast.email is '${downcast.email}' (undefined because downcasting is unchecked)`);
 
   const erasure = demonstrateTypeErasure();
-  warning(`Type Erasure: ("12345" as number) typeof at runtime = '${erasure.runtimeType}' (NOT number!)`);
+  warning(`Type Erasure: ("12345" as number) -> typeof at runtime is '${erasure.runtimeType}' (NOT number!)`);
 
   const overlap = explainOverlapRule();
-  info(`Overlap Rule: Disjoint types (e.g. string as number) are rejected at compile-time (TS2352)`);
-
-  console.log();
+  info(`Overlap Rule: Disjoint types (e.g. ("hello" as number)) are rejected at compile-time with TS2352`);
 
   // --------------------------------------------------------------------------
   // SECTION 2: Chain Casting Hazards (as unknown as T)
   // --------------------------------------------------------------------------
   section("2. Chain Casting Hazards ('as unknown as T')");
-  console.log(`  ${colors.dim}Bypassing the compiler safety net creates silent runtime catastrophes:${colors.reset}\n`);
+  console.log(`  ${colors.dim}Why double assertion is a dangerous anti-pattern:${colors.reset}\n`);
 
   // Hazard 1: Missing Method
+  codeSnippet("Hazard 1: Missing Method / The Type Illusion", `
+const fakeGateway = ({ refund: () => true } as unknown) as PaymentGateway;
+// 🔒 COMPILE-TIME: Compiles with 0 errors! TS believes .charge() exists.
+fakeGateway.charge(2500); // 💥 RUNTIME CRASH
+  `);
   const hazard1 = simulateMissingMethodCrash();
-  failure(`Hazard 1 (Missing Method): fakeGateway.charge(2500) threw:`);
-  console.log(`    ${colors.red}${hazard1.errorThrown}${colors.reset}`);
-  info(`Compile-time: ${hazard1.compileTimeView}`);
+  failure(`fakeGateway.charge(2500) threw at runtime:`);
+  console.log(`    ${colors.red}${hazard1.errorThrown}${colors.reset}\n`);
 
   // Hazard 2: Deserialization
+  codeSnippet("Hazard 2: Deserialization & Nested Undefined Property Access", `
+const parsed = JSON.parse('{"id": "usr_404", "name": "Jane"}');
+const profile = (parsed as unknown) as UserProfile; // TS assumes .settings exists!
+console.log(profile.settings.notifications.email);  // 💥 RUNTIME CRASH
+  `);
   const hazard2 = simulateDeserializationBug();
-  failure(`Hazard 2 (Deserialization Bug): profile.settings.notifications.email threw:`);
-  console.log(`    ${colors.red}${hazard2.errorThrown}${colors.reset}`);
+  failure(`profile.settings.notifications.email threw at runtime:`);
+  console.log(`    ${colors.red}${hazard2.errorThrown}${colors.reset}\n`);
 
   // Hazard 3: Prototype Mismatch
+  codeSnippet("Hazard 3: Class Prototype Invalidation", `
+const plainObj = { accountNumber: "ACC-123", balanceCents: 50000 };
+const account = (plainObj as unknown) as BankAccount; // NOT created via 'new BankAccount()'
+account.deposit(1000); // 💥 RUNTIME CRASH: deposit is not in prototype chain
+  `);
   const hazard3 = simulatePrototypeMismatch();
-  failure(`Hazard 3 (Class Prototype Invalidation): account.deposit(1000) threw:`);
-  console.log(`    ${colors.red}${hazard3.errorThrown}${colors.reset}`);
-  info(`Object was plain JSON literal, not instantiated via 'new BankAccount()'`);
+  failure(`account.deposit(1000) threw at runtime:`);
+  console.log(`    ${colors.red}${hazard3.errorThrown}${colors.reset}\n`);
 
   // Hazard 4: Date Coercion
+  codeSnippet("Hazard 4: Date / Primitive Coercion Failure", `
+const parsed = JSON.parse('{"orderId": "ord_1", "placedAt": "2026-08-30T10:00:00Z"}');
+const order = (parsed as unknown) as OrderPayload; // ISO string forced to Date!
+order.placedAt.getFullYear(); // 💥 RUNTIME CRASH: placedAt is a string, not a Date
+  `);
   const hazard4 = simulateDateCoercionBug();
-  failure(`Hazard 4 (Date Coercion Failure): order.placedAt.getFullYear() threw:`);
-  console.log(`    ${colors.red}${hazard4.errorThrown}${colors.reset}`);
-  info(`Runtime type of placedAt was '${hazard4.rawType}', not Date instance`);
-
-  console.log();
+  failure(`order.placedAt.getFullYear() threw at runtime:`);
+  console.log(`    ${colors.red}${hazard4.errorThrown}${colors.reset}\n`);
 
   // --------------------------------------------------------------------------
   // SECTION 3: Safe Production-Grade Alternatives
   // --------------------------------------------------------------------------
-  section("3. Safe Production Alternatives");
+  section("3. Safe Production Alternatives (Guards, Schemas, Mappers)");
 
-  // Alternative 1: Type Guards
-  const validProfile = {
-    id: "usr_101",
-    name: "Alice",
-    settings: { notifications: { email: true, sms: false } },
-  };
+  codeSnippet("Pattern A: User-Defined Type Guard (x is T)", `
+function isUserProfile(val: unknown): val is UserProfile {
+  return typeof val === "object" && val !== null && "id" in val && "settings" in val ...;
+}
+if (isUserProfile(raw)) {
+  console.log(raw.settings.notifications.email); // ✅ Type-safe narrowing!
+}
+  `);
+  const validProfile = { id: "usr_101", name: "Alice", settings: { notifications: { email: true, sms: false } } };
   const invalidProfile = { id: "usr_102", name: "Bob" };
+  if (isUserProfile(validProfile)) success(`Type Guard: Valid profile narrowed safely -> email = ${validProfile.settings.notifications.email}`);
+  if (!isUserProfile(invalidProfile)) success(`Type Guard: Malformed profile safely rejected without crashing`);
 
-  if (isUserProfile(validProfile)) {
-    success(`Type Guard (isUserProfile): Valid profile safely narrowed -> email = ${validProfile.settings.notifications.email}`);
-  }
-  if (!isUserProfile(invalidProfile)) {
-    success(`Type Guard (isUserProfile): Malformed profile safely rejected without crashing`);
-  }
-
-  // Alternative 2: Schema Parsing
-  const rawOrder = {
-    orderId: "ord_990",
-    totalCents: 4950,
-    placedAt: "2026-08-30T12:00:00.000Z",
-  };
+  console.log();
+  codeSnippet("Pattern B: Schema Parser ('Parse, Don't Validate')", `
+function parseOrder(raw: unknown): Result<OrderPayload, Error> {
+  // Validates numbers, parses ISO date strings to real Date instances, returns typed Result
+}
+  `);
+  const rawOrder = { orderId: "ord_990", totalCents: 4950, placedAt: "2026-08-30T12:00:00.000Z" };
   const parseResult = parseOrderPayload(rawOrder);
   if (parseResult.success) {
-    const year = parseResult.data.placedAt.getFullYear();
-    success(`Schema Parser: Successfully parsed and instantiated Date -> Year = ${year}`);
+    success(`Schema Parser: Successfully parsed ISO string to Date -> Year = ${parseResult.data.placedAt.getFullYear()}`);
   }
 
-  const badOrder = { orderId: "", totalCents: -500, placedAt: "not-a-date" };
-  const badParseResult = parseOrderPayload(badOrder);
-  if (!badParseResult.success) {
-    success(`Schema Parser: Defensively caught ${badParseResult.errors.length} validation errors:`);
-    for (const err of badParseResult.errors) {
-      info(`  Field '${err.path}': ${err.message}`);
-    }
-  }
-
-  // Alternative 3: Domain Entity Mappers
-  const account = mapDtoToBankAccount({
-    account_number: "ACC-9988",
-    initial_balance_cents: 10000,
-  });
+  console.log();
+  codeSnippet("Pattern C: Domain Entity Mapper / Factory Function", `
+function mapToBankAccount(dto: RawAccountDto): BankAccount {
+  return new BankAccount(dto.account_number, dto.initial_balance_cents); // ✅ Genuine prototype!
+}
+  `);
+  const account = mapDtoToBankAccount({ account_number: "ACC-9988", initial_balance_cents: 10000 });
   account.deposit(5000);
-  success(`Domain Mapper: BankAccount instantiated via constructor -> Balance = $${(account.getBalance() / 100).toFixed(2)}`);
+  success(`Domain Mapper: Instantiated via constructor -> Balance = $${(account.getBalance() / 100).toFixed(2)}`);
 
-  // Alternative 4: Discriminated Unions
-  const paymentSummary = formatPaymentDetails({
-    kind: "CRYPTO_WALLET",
-    address: "0x71C...392",
-    network: "ETH",
-  });
-  success(`Discriminated Union: Exhaustively formatted -> ${paymentSummary}`);
-
-  // Alternative 5: satisfies operator
-  const satisfiesDemo = demonstrateSatisfies();
-  success(`'satisfies' Operator: Verified RouteConfig without widening method literal '${satisfiesDemo.methodExactLiteral}'`);
-
-  // Alternative 6: as const
-  const constDemo = demonstrateConstAssertion();
-  success(`'as const' Assertion: Created immutable literal registry (${constDemo.rolesCount} roles)`);
+  console.log();
+  codeSnippet("Pattern D: Discriminated Unions + Exhaustive Checking", `
+type PaymentMethod = { kind: "CARD"; ... } | { kind: "CRYPTO"; network: "ETH"; ... };
+switch (method.kind) {
+  case "CARD": return ...;
+  case "CRYPTO": return ...;
+  default: const _exhaustive: never = method; throw new Error(...);
+}
+  `);
+  const paymentSummary = formatPaymentDetails({ kind: "CRYPTO_WALLET", address: "0x71C...392", network: "ETH" });
+  success(`Discriminated Union: ${paymentSummary}`);
 
   // --------------------------------------------------------------------------
   // SECTION 4: as vs. satisfies Operator Comparison
   // --------------------------------------------------------------------------
   section("4. 'as' vs. 'satisfies' Operator Comparison");
   
+  codeSnippet("'as' (Widens/Loses specific types) vs 'satisfies' (Preserves exact literals)", `
+type Palette = Record<string, string | [number, number, number]>;
+
+// With 'satisfies':
+const palette = { primary: "#3b82f6", accent: [255, 128, 0] } satisfies Palette;
+palette.primary.toUpperCase(); // ✅ TS knows primary is string!
+palette.accent[0];            // ✅ TS knows accent is array!
+
+// With 'as Palette':
+// palette.primary.toUpperCase(); // ❌ Error: Property toUpperCase does not exist on array union
+  `);
+
   const palette = demonstratePaletteSafety();
-  success(`'satisfies' vs 'as' Widening: 'palette.primary' retains string (${palette.primaryUpper}), 'accent' retains array (red=${palette.accentRedChannel})`);
+  success(`'satisfies' Type Preservation: 'palette.primary' retains string (${palette.primaryUpper}), 'accent' retains array (red=${palette.accentRedChannel})`);
   
   const typos = demonstrateTypoCatching();
   success(`'satisfies' catches missing/misspelled properties at compile time; 'as' silences them`);
@@ -210,10 +242,9 @@ export function runDemo(): void {
   
   info(`'as const satisfies': ALLOWED_DOMAINS[0] = '${activeFlags.ALLOWED_DOMAINS[0]}' (Immutable tuple & contract safe)`);
 
-  console.log(`\n${colors.bold}${colors.green}✨ All demonstrations completed successfully!${colors.reset}\n`);
+  console.log(`\n${colors.bold}${colors.green}✨ All casting demonstrations completed!${colors.reset}\n`);
 }
 
-// Execute if run directly
 if (import.meta.main) {
   runDemo();
 }
